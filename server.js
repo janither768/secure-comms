@@ -9,11 +9,9 @@ let activeUsers = {};
 let roomConstraints = {}; 
 const HEARTBEAT_MS = 45000;
 
-// --- CRITICAL FIX: Forces modern phones (Redmi) to scale to 100% ---
 const metaViewport = `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">`;
 const fontImport = `<link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">`;
 
-// Added input font-size to prevent mobile auto-zoom on text fields
 const commonStyle = `
   body { background-color: #0a0c10; font-family: sans-serif; color: #a1b0c0; margin: 0; }
   .btn-tactical { background-color: #5D3FD3; color: white; border: none; padding: 12px 24px; cursor: pointer; font-family: 'Michroma', sans-serif; text-transform: uppercase; font-weight: bold; }
@@ -21,17 +19,19 @@ const commonStyle = `
   input { font-size: 16px; } 
 `;
 
-// --- PHASE 1: PRE-CHANNEL ---
-// Status Matrix locked to top-left. Logo loaded as the background.
+// --- PHASE 1: PRE-CHANNEL (RE-ENGINEERED) ---
 const renderLanding = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
-<body style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background: #0a0c10 url(https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg) no-repeat center center; -webkit-background-size: 100% auto; background-size: 100% auto;">  
-  <div class="status-matrix" style="position: absolute; top: 15px; left: 15px; text-align: left; margin: 0;">
+<body style="background-color: #0a0c10; margin: 0; height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+  
+  <div class="status-matrix" style="position: absolute; top: 15px; left: 15px; z-index: 10; text-align: left; margin: 0;">
     <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
     <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
   </div>
   
-  <button class="btn-tactical" onclick="window.location.href='/boot'" style="z-index: 10; position: relative; box-shadow: 0px 4px 15px rgba(0,0,0,0.5);">[ ENGAGE CHANNEL ]</button>
+  <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg" alt="" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 100%; height: auto; margin: auto; z-index: 1; border: none;">
+  
+  <button class="btn-tactical" onclick="window.location.href='/boot'" style="z-index: 10; position: relative; box-shadow: 0px 4px 20px rgba(0,0,0,0.8);">[ ENGAGE CHANNEL ]</button>
 </body></html>`;
 
 // --- PHASE 2: LOGIN ---
