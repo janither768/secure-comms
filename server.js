@@ -22,16 +22,28 @@ const commonStyle = `
 // --- PHASE 1: PRE-CHANNEL (RE-ENGINEERED) ---
 const renderLanding = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
-<body style="background-color: #0a0c10; margin: 0; height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+<body style="background-color: #0a0c10; margin: 0; height: 100vh; position: relative; overflow: hidden;">
   
+  <!-- Status matrix: anchored top‑left, always on top -->
   <div class="status-matrix" style="position: absolute; top: 15px; left: 15px; z-index: 10; text-align: left; margin: 0;">
     <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
     <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
   </div>
-  
-  <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg" alt="" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 100%; height: auto; margin: auto; z-index: 1; border: none;">
-  
-  <button class="btn-tactical" onclick="window.location.href='/boot'" style="z-index: 10; position: relative; box-shadow: 0px 4px 20px rgba(0,0,0,0.8);">[ ENGAGE CHANNEL ]</button>
+
+  <!-- Centred logo + button block, works on both engines -->
+  <div style="position: absolute; top: 50%; left: 0; right: 0; 
+              -webkit-transform: translateY(-50%); 
+              transform: translateY(-50%); 
+              z-index: 2; text-align: center;">
+    <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg" 
+         alt="" 
+         style="width: 100%; height: auto; display: block; border: none; margin: 0;">
+    <button class="btn-tactical" 
+            onclick="window.location.href='/boot'" 
+            style="margin-top: 20px; box-shadow: 0px 4px 20px rgba(0,0,0,0.8); display: inline-block;">
+      [ ENGAGE CHANNEL ]
+    </button>
+  </div>
 </body></html>`;
 
 // --- PHASE 2: LOGIN ---
