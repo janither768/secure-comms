@@ -49,8 +49,8 @@ const renderPage = (user = '', room = '', error = '') => {
     ${!user ? `
       <div style="padding: 20px; text-align: center;">
         <form method="POST" action="/login" style="background: #11151c; padding: 20px; border: 1px solid #2d3748; display: inline-block; width: 80%;">
-          <input type="text" name="username" placeholder="Callsign (e.g. Jp921)" required style="width: 90%; margin-bottom: 10px; padding: 10px; background: #0a0c10; border: 1px solid #2d3748; color: #fff;"><br>
-          <input type="password" name="passcode" placeholder="Room Key" required style="width: 90%; margin-bottom: 10px; padding: 10px; background: #0a0c10; border: 1px solid #2d3748; color: #fff;"><br>
+          <input type="text" name="username" placeholder="Operator Callsign" required style="width: 90%; margin-bottom: 10px; padding: 10px; background: #0a0c10; border: 1px solid #2d3748; color: #fff;"><br>
+          <input type="password" name="passcode" placeholder="Access Channel" required style="width: 90%; margin-bottom: 10px; padding: 10px; background: #0a0c10; border: 1px solid #2d3748; color: #fff;"><br>
           <button type="submit" style="width: 100%; padding: 10px; background: #1c2b36; color: #fff; border: none;">INITIALIZE</button>
         </form>
       </div>
