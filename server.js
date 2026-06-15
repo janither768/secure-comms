@@ -20,9 +20,7 @@ const commonStyle = `
   input { font-size: 16px; }
 `;
 
-// ==================================================
-//  PHASE 1: PRE-CHANNEL (LANDING) – TABLE CENTERING
-// ==================================================
+// ============ PHASE 1: PRE-CHANNEL (LIVE STATUS OVERHAUL) ============
 const renderLanding = (stats = {}) => {
   const { totalOps = 0, activeChannels = 0, totalMessages = 0, uptimeStr = '--' } = stats;
 
@@ -35,9 +33,8 @@ const renderLanding = (stats = {}) => {
 
   <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
-      <!-- Status row – top-left tactical HUD -->
+      <!-- Status row – top-left tactical HUD with backdrop -->
       <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
-        <!-- Semi-transparent backdrop for readability -->
         <div style="background:rgba(10,12,16,0.75); display:inline-block; padding:8px 12px; border-radius:4px; border:1px solid #1f2937;">
           <div class="status-matrix" style="margin:0;">
             <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
@@ -66,45 +63,32 @@ const renderLanding = (stats = {}) => {
 </body></html>`;
 };
 
-// ==================================================
-//  PHASE 2: LOGIN – TABLE CENTERING, NO FLEX
-// ==================================================
+// ============ PHASE 2: LOGIN ============
 const renderLogin = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
 <body style="background-color:#0a0c10; margin:0; height:100vh;">
-
-  <!-- Table centering the login form exactly in the middle -->
   <div style="display:table; width:100%; height:100%;">
     <div style="display:table-cell; vertical-align:middle; text-align:center;">
-
       <form method="POST" action="/login"
             style="background:#11151c; padding:20px; border:1px solid #2d3748; 
                    width:85%; max-width:320px; display:inline-block; text-align:left;
                    box-sizing:border-box;">
-
         <input type="text" name="username" placeholder="Callsign" required
                style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
                       border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
-
         <input type="password" name="passcode" placeholder="Channel" required
                style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
                       border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
-
         <input type="text" name="target" placeholder="Target Alias (Optional)"
                style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
                       border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
-
         <button type="submit" class="btn-tactical" style="width:100%;">INITIALIZE</button>
       </form>
-
     </div>
   </div>
 </body></html>`;
 
-// ==================================================
-//  PHASE 3: IN-CHANNEL (CHAT) – NO FLEX, NO FIXED
-// ==================================================
-
+// ============ PHASE 3: IN-CHANNEL (CHAT WITH TIMESTAMPS) ============
 const renderChat = (user, room) => {
   if (!db[room]) db[room] = [];
   if (!activeUsers[room]) activeUsers[room] = {};
@@ -122,7 +106,6 @@ const renderChat = (user, room) => {
   const connectionStatusText = `${activeCount} OPERATORS CONNECTED`;
 
   const chatHtml = db[room].map(m => {
-    // Format timestamp to HH:MM (UTC)
     let timeStr = '';
     if (m.timestamp) {
       const d = new Date(m.timestamp);
@@ -149,13 +132,13 @@ const renderChat = (user, room) => {
   ).toString('base64');
 
   return `<!DOCTYPE html>
-<html><head>${metaViewport}${fontImport}<style>${commonStyle}
+<html><head>${metaViewport}${fontImport}<style>
+    ${commonStyle}
     html, body { height: 100%; margin: 0; }
     input { font-size: 16px; }
 </style></head>
 <body style="padding-bottom:150px; padding-top:60px; background:#0a0c10; margin:0;">
 
-  <!-- Fixed top bar (classic) -->
   <div style="position:fixed; top:0; left:0; right:0; background:#11151c; border-bottom:1px solid #1f2937; 
               padding:15px; display:block; z-index:100; box-sizing:border-box;">
     <span style="float:left; font-size:0.8em; color:#5c748c;">CH: ${room}</span>
@@ -163,12 +146,10 @@ const renderChat = (user, room) => {
     <div style="clear:both;"></div>
   </div>
 
-  <!-- Message area – body scrolls, no inner scroll -->
   <div style="padding:15px;">
     ${chatHtml}
   </div>
 
-  <!-- Fixed bottom command bar (classic) -->
   <div style="position:fixed; bottom:0; left:0; right:0; background:#11151c; border-top:1px solid #2d3748; 
               padding:10px; text-align:center; z-index:100; box-sizing:border-box;">
     <form method="POST" action="/send" style="margin-bottom:10px; display:block; text-align:center;">
@@ -189,18 +170,8 @@ const renderChat = (user, room) => {
 </body></html>`;
 };
 
-// Routes – unchanged
-app.get('/', (req, res) => res.send(renderLanding()));
-app.get('/boot', (req, res) => res.send(renderLogin()));
-
-app.post('/login', (req, res) => {
-  const { username, passcode, target } = req.body;
-  if (target) roomConstraints[passcode] = { target, creator: username };
-  res.redirect(`/chat?user=${encodeURIComponent(username)}&room=${encodeURIComponent(passcode)}`);
-});
-
+// ============ ROUTES ============
 app.get('/', (req, res) => {
-  // Count active operators and channels
   let totalOps = 0;
   const now = Date.now();
   for (const room of Object.keys(activeUsers)) {
@@ -212,14 +183,10 @@ app.get('/', (req, res) => {
     if (roomActive > 0) totalOps += roomActive;
   }
   const activeChannels = Object.keys(db).length;
-
-  // Total messages in memory
   let totalMessages = 0;
   for (const room of Object.keys(db)) {
     totalMessages += db[room].length;
   }
-
-  // Uptime formatting
   const uptimeMs = now - SERVER_START;
   const days = Math.floor(uptimeMs / 86400000);
   const hours = Math.floor((uptimeMs % 86400000) / 3600000);
@@ -227,6 +194,23 @@ app.get('/', (req, res) => {
   const uptimeStr = `${days}D ${String(hours).padStart(2, '0')}H ${String(minutes).padStart(2, '0')}M`;
 
   res.send(renderLanding({ totalOps, activeChannels, totalMessages, uptimeStr }));
+});
+
+app.get('/boot', (req, res) => res.send(renderLogin()));
+
+app.post('/login', (req, res) => {
+  const { username, passcode, target } = req.body;
+  if (target) roomConstraints[passcode] = { target, creator: username };
+  res.redirect(`/chat?user=${encodeURIComponent(username)}&room=${encodeURIComponent(passcode)}`);
+});
+
+app.get('/chat', (req, res) => {
+  const { user, room } = req.query;
+  const constraints = roomConstraints[room];
+  if (constraints && user !== constraints.target && user !== constraints.creator) {
+    return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+  }
+  res.send(renderChat(user, room));
 });
 
 app.post('/send', (req, res) => {
