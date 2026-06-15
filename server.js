@@ -25,7 +25,7 @@ const commonStyle = `
 // Status Matrix locked to top-left. Logo loaded as the background.
 const renderLanding = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
-<body style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background: #0a0c10 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg') no-repeat center center; -webkit-background-size: 100% auto; background-size: 100% auto;">  
+<body style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background: #0a0c10 url(https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg) no-repeat center center; -webkit-background-size: 100% auto; background-size: 100% auto;">  
   <div class="status-matrix" style="position: absolute; top: 15px; left: 15px; text-align: left; margin: 0;">
     <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
     <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
