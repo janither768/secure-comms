@@ -24,8 +24,7 @@ const renderLanding = () => `<!DOCTYPE html>
     <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
     <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
   </div>
-  
-  <h1 style="font-family:'Michroma', sans-serif; color:#fff; margin-bottom:30px;">STRATSIGNAL</h1>
+  <img src="PASTE_YOUR_RAW_GITHUB_URL_HERE" alt="STRATSIGNAL" style="max-width:250px; margin-bottom:30px;">
   
   <button class="btn-tactical" onclick="window.location.href='/boot'">[ ENGAGE CHANNEL ]</button>
 </body></html>`;
