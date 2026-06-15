@@ -129,51 +129,41 @@ const renderChat = (user, room) => {
   ).toString('base64');
 
   return `<!DOCTYPE html>
-<html><head>${metaViewport}${fontImport}<style>
-    ${commonStyle}
+<html><head>${metaViewport}${fontImport}<style>${commonStyle}
     html, body { height: 100%; margin: 0; }
-    .chat-wrapper { position:relative; width:100%; height:100%; overflow:hidden; background:#0a0c10; }
-    .chat-header { position:absolute; top:0; left:0; right:0; height:50px; 
-                   background:#11151c; border-bottom:1px solid #1f2937; 
-                   padding:0 15px; line-height:50px; z-index:100; }
-    .chat-header .ch-label { float:left; font-size:0.8em; color:#5c748c; }
-    .chat-header .conn-status { float:right; font-size:0.7em; font-weight:bold; letter-spacing:1px; }
-    .chat-messages { position:absolute; top:50px; left:0; right:0; bottom:120px; 
-                     overflow:auto; padding:15px; }
-    .chat-input-bar { position:absolute; bottom:0; left:0; right:0; height:120px; 
-                      background:#11151c; border-top:1px solid #2d3748; 
-                      text-align:center; padding:10px; box-sizing:border-box; z-index:100; }
-    .chat-input-bar form { margin-bottom:10px; }
-    .chat-input-bar input[type="text"] { width:70%; padding:12px; background:#0a0c10; 
-                                         border:1px solid #2d3748; color:#fff; margin-right:5px; 
-                                         box-sizing:border-box; font-size:16px; }
-    .chat-input-bar button[type="submit"] { padding:12px 20px; font-weight:bold; 
-                                            background:#1c2b36; color:#fff; border:1px solid #2d3748; }
-    .chat-links { font-size:0.7em; }
-    .chat-links a { color:#5c748c; text-decoration:none; }
-    .chat-links .kill-link { color:#ff4c4c; font-weight:bold; }
+    input { font-size: 16px; }
 </style></head>
-<body>
-  <div class="chat-wrapper">
-    <div class="chat-header">
-      <span class="ch-label">CH: ${room}</span>
-      <span class="conn-status" style="color:${isSecure ? '#39ff14' : '#5c748c'};">${connectionStatusText} ●</span>
-    </div>
-    <div class="chat-messages">${chatHtml}</div>
-    <div class="chat-input-bar">
-      <form method="POST" action="/send">
-        <input type="hidden" name="user" value="${user}">
-        <input type="hidden" name="room" value="${room}">
-        <input type="text" name="message" required placeholder="Transmit...">
-        <button type="submit">&gt;</button>
-      </form>
-      <div class="chat-links">
-        <a href="data:text/plain;base64,${encodedExport}" download="chat.txt">[ CONVO DOWNLOAD ]</a>
-        <span style="color:#2d3748; margin:0 3px;">|</span>
-        <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}">[ PING ]</a>
-        <span style="color:#2d3748; margin:0 3px;">|</span>
-        <a href="/purge?room=${encodeURIComponent(room)}" class="kill-link">[ KILL ]</a>
-      </div>
+<body style="padding-bottom:150px; padding-top:60px; background:#0a0c10; margin:0;">
+
+  <!-- Fixed top bar (classic) -->
+  <div style="position:fixed; top:0; left:0; right:0; background:#11151c; border-bottom:1px solid #1f2937; 
+              padding:15px; display:block; z-index:100; box-sizing:border-box;">
+    <span style="float:left; font-size:0.8em; color:#5c748c;">CH: ${room}</span>
+    <span style="float:right; font-size:0.7em; color:${isSecure ? '#39ff14' : '#5c748c'}; font-weight:bold; letter-spacing:1px;">${connectionStatusText} ●</span>
+    <div style="clear:both;"></div>
+  </div>
+
+  <!-- Message area – body scrolls, no inner scroll -->
+  <div style="padding:15px;">
+    ${chatHtml}
+  </div>
+
+  <!-- Fixed bottom command bar (classic) -->
+  <div style="position:fixed; bottom:0; left:0; right:0; background:#11151c; border-top:1px solid #2d3748; 
+              padding:10px; text-align:center; z-index:100; box-sizing:border-box;">
+    <form method="POST" action="/send" style="margin-bottom:10px; display:block; text-align:center;">
+      <input type="hidden" name="user" value="${user}">
+      <input type="hidden" name="room" value="${room}">
+      <input type="text" name="message" required placeholder="Transmit..." 
+             style="width:70%; padding:12px; background:#0a0c10; border:1px solid #2d3748; color:#fff; margin-right:5px; box-sizing:border-box; font-size:16px;">
+      <button type="submit" style="padding:12px 20px; font-weight:bold; background:#1c2b36; color:#fff; border:1px solid #2d3748;">&gt;</button>
+    </form>
+    <div style="font-size:0.7em;">
+      <a href="data:text/plain;base64,${encodedExport}" download="chat.txt" style="color:#5c748c; text-decoration:none;">[ CONVO DOWNLOAD ]</a>
+      <span style="color:#2d3748; margin:0 3px;">|</span>
+      <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}" style="color:#5c748c; text-decoration:none;">[ PING ]</a>
+      <span style="color:#2d3748; margin:0 3px;">|</span>
+      <a href="/purge?room=${encodeURIComponent(room)}" style="color:#ff4c4c; text-decoration:none; font-weight:bold;">[ KILL ]</a>
     </div>
   </div>
 </body></html>`;
