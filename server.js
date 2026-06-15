@@ -4,73 +4,142 @@ const port = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 
-let memoryStore = {};
+// In-memory databases
+let db = {};
+let activeUsers = {}; // Tracks { "RoomKey": { "Callsign": Timestamp } }
 
-const renderPage = (user, room, error = '') => {
-  const history = memoryStore[room] || [];
-  
-  let chatHtml = history.map(m => {
-    const isMe = m.sender === user;
-    return `
-      <div style="text-align: ${isMe ? 'right' : 'left'}; margin-bottom: 10px; clear: both;">
-        <div style="display: inline-block; background-color: ${isMe ? '#1c2b36' : '#161b22'}; padding: 10px; border-radius: 6px; border: 1px solid #2c4251; max-width: 80%; text-align: left;">
-          <span style="font-size: 0.7em; color: #5c748c;">${m.sender}</span><br>
-          <span style="color: #a1b0c0;">${m.text}</span>
+// Heartbeat window: 45 seconds
+const HEARTBEAT_MS = 45000; 
+
+const renderPage = (user = '', room = '', error = '') => {
+  let chatHtml = '';
+  let exportData = '';
+  let isSecure = false;
+
+  if (user && room) {
+    if (!db[room]) db[room] = [];
+    if (!activeUsers[room]) activeUsers[room] = {};
+    
+    // Register the heartbeat for the operator currently pinging/sending
+    activeUsers[room][user] = Date.now();
+
+    // Sweep the room for active connections
+    const now = Date.now();
+    let activeCount = 0;
+    for (const [operator, lastSeen] of Object.entries(activeUsers[room])) {
+      if (now - lastSeen < HEARTBEAT_MS) {
+        activeCount++;
+      } else {
+        delete activeUsers[room][operator]; // Clean up ghosted operators
+      }
+    }
+
+    // If 2 or more operators are alive in the 45s window, the link is green
+    isSecure = activeCount >= 2;
+
+    chatHtml = db[room].map(m => {
+      const isMe = m.sender === user;
+      exportData += `[${m.sender}]: ${m.text}\n`; 
+      return `
+        <div style="text-align: ${isMe ? 'right' : 'left'}; margin-bottom: 10px; clear: both;">
+          <div style="display: inline-block; background: ${isMe ? '#1c2b36' : '#161b22'}; padding: 10px; border-radius: 8px; max-width: 80%; text-align: left; border: 1px solid ${isMe ? '#2c4251' : '#2d3748'};">
+            <b style="font-size: 0.7em; color: #5c748c;">${m.sender}</b><br>
+            <span style="color: #a1b0c0;">${m.text}</span>
+          </div>
         </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+  }
 
-  return `
-  <html><body style="background-color: #0a0c10; font-family: sans-serif; color: #a1b0c0; padding: 10px; margin: 0;">
-    <div style="background: #11151c; padding: 10px; border-bottom: 1px solid #1f2937; display: flex; justify-content: space-between; align-items: center;">
-      <small>CHANNEL: ${room}</small>
-      <div>
-        <a href="/download?room=${room}" style="color: #5c748c; font-size: 0.8em; margin-right: 15px; text-decoration: none;">SAVE</a>
-        <a href="/purge?room=${room}" style="color: #ff4c4c; font-size: 0.8em; font-weight: bold; text-decoration: none;">KIL SWITCH</a>
+  const encodedExport = Buffer.from(exportData).toString('base64');
+
+  // The Mint UI: LED Styling
+  const ledStyle = isSecure 
+    ? 'background-color: #39ff14; box-shadow: 0 0 8px #39ff14;' // Glowing Terminal Lime
+    : 'background-color: #5c2b2b; border: 1px solid #ff4c4c;'; // Dim Dormant Red
+
+  const ledText = isSecure ? 'LINK SECURE' : 'AWAITING HANDSHAKE';
+
+  return `<!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Secure Net</title>
+  </head>
+  <body style="background-color: #0a0c10; font-family: sans-serif; color: #a1b0c0; margin: 0; padding-bottom: 150px;">
+    
+    <div style="background: #11151c; border-bottom: 1px solid #1f2937; padding: 15px; position: sticky; top: 0; z-index: 100;">
+      <div style="float: left; font-size: 0.8em; color: #5c748c; margin-top: 2px;">
+        CH: ${room || 'OFFLINE'}
       </div>
+      ${user ? `
+        <div style="float: right; font-size: 0.7em; color: ${isSecure ? '#39ff14' : '#5c748c'}; font-weight: bold; letter-spacing: 1px;">
+          ${ledText} <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 6px; ${ledStyle}"></span>
+        </div>
+      ` : ''}
+      <div style="clear: both;"></div>
     </div>
-    <div style="padding: 10px; padding-bottom: 130px;">${chatHtml}</div>
-    <div style="position:fixed; bottom:0; left:0; width:100%; background:#11151c; padding:10px; border-top: 1px solid #1f2937;">
-      <form method="POST" action="/send" style="display: flex; gap: 5px;">
-        <input type="hidden" name="user" value="${user}"><input type="hidden" name="room" value="${room}">
-        <input type="text" name="message" style="flex-grow: 1; padding: 10px; background:#0a0c10; border:1px solid #2d3748; color:#fff;" required>
-        <button type="submit" style="padding: 8px 15px; background: #1c2b36; border: 1px solid #2c4251; color: #8b9aab;">TX</button>
-      </form>
-      <button onclick="window.location.reload()" style="width:100%; margin-top:10px; padding: 8px; background: transparent; border: 1px solid #2d3748; color: #5c748c; cursor: pointer;">PING FEED</button>
-    </div>
-  </body></html>`;
+    
+    ${!user ? `
+      <div style="padding: 20px; text-align: center;">
+        <form method="POST" action="/login" style="background: #11151c; padding: 20px; border: 1px solid #2d3748; display: inline-block; width: 80%;">
+          <input type="text" name="username" placeholder="Operator Callsign" required style="width: 90%; margin-bottom: 10px; padding: 10px; background: #0a0c10; border: 1px solid #2d3748; color: #fff;"><br>
+          <input type="password" name="passcode" placeholder="Access Channel" required style="width: 90%; margin-bottom: 10px; padding: 10px; background: #0a0c10; border: 1px solid #2d3748; color: #fff;"><br>
+          <button type="submit" style="width: 100%; padding: 10px; background: #1c2b36; color: #fff; border: none;">INITIALIZE</button>
+        </form>
+      </div>
+    ` : `
+      <div style="padding: 15px;">${chatHtml}</div>
+      
+      <div style="position: fixed; bottom: 0; width: 100%; background: #11151c; border-top: 1px solid #2d3748; padding: 10px; text-align: center; box-sizing: border-box;">
+        <form method="POST" action="/send" style="margin-bottom: 10px;">
+          <input type="hidden" name="user" value="${user}">
+          <input type="hidden" name="room" value="${room}">
+          <input type="text" name="message" style="width: 60%; padding: 10px; background: #0a0c10; border: 1px solid #2d3748; color: #fff;" required>
+          <button type="submit" style="padding: 10px;">TX</button>
+        </form>
+        
+        <a href="data:text/plain;base64,${encodedExport}" download="chat_log_${room}.txt" style="color: #5c748c; text-decoration: none; font-size: 0.8em;">[ DOWNLOAD ARCHIVE ]</a>
+        <span style="margin: 0 10px; color: #2d3748;">|</span>
+        <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}" style="color: #5c748c; text-decoration: none; font-size: 0.8em;">[ PING FEED ]</a>
+        <span style="margin: 0 10px; color: #2d3748;">|</span>
+        <a href="/purge?room=${encodeURIComponent(room)}" style="color: #ff4c4c; text-decoration: none; font-size: 0.8em; font-weight: bold;">[ PURGE ]</a>
+      </div>
+    `}
+  </body>
+  </html>`;
 };
 
+app.get('/', (req, res) => res.send(renderPage()));
+
 app.post('/login', (req, res) => {
-  const { username, passcode } = req.body;
-  if (!memoryStore[passcode]) memoryStore[passcode] = [];
-  res.redirect(`/chat?user=${username}&room=${passcode}`);
+  const safeUser = encodeURIComponent(req.body.username || '');
+  const safeRoom = encodeURIComponent(req.body.passcode || '');
+  res.redirect(`/chat?user=${safeUser}&room=${safeRoom}`);
 });
 
 app.get('/chat', (req, res) => res.send(renderPage(req.query.user, req.query.room)));
 
 app.post('/send', (req, res) => {
-  const { user, room, message } = req.body;
-  if (memoryStore[room]) memoryStore[room].push({ sender: user, text: message });
-  res.redirect(`/chat?user=${user}&room=${room}`);
+  const u = req.body.user;
+  const r = req.body.room;
+  const m = req.body.message;
+  
+  if (u && r && m) {
+    if (!db[r]) db[r] = [];
+    db[r].push({ sender: u, text: m });
+  }
+  res.redirect(`/chat?user=${encodeURIComponent(u || '')}&room=${encodeURIComponent(r || '')}`);
 });
 
-// Download Log
-app.get('/download', (req, res) => {
-  const room = req.query.room;
-  const data = (memoryStore[room] || []).map(m => `[${m.sender}]: ${m.text}`).join('\n');
-  res.setHeader('Content-disposition', 'attachment; filename=comms_log.txt');
-  res.setHeader('Content-Type', 'text/plain');
-  res.send(data);
-});
-
-// Hard KIL SWITCH
 app.get('/purge', (req, res) => {
-  // Wipes all data for the specified channel immediately
-  delete memoryStore[req.query.room];
-  // Redirects all clients to the login page
+  const targetRoom = req.query.room;
+  if (targetRoom) {
+    if (db[targetRoom]) delete db[targetRoom];
+    if (activeUsers[targetRoom]) delete activeUsers[targetRoom]; // Wipe heartbeats too
+  }
   res.redirect('/');
 });
 
-app.listen(port);
+app.listen(port, () => console.log('Tactical Net Active.'));
