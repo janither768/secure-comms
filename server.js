@@ -23,33 +23,39 @@ const commonStyle = `
 //  PHASE 1: PRE-CHANNEL (LANDING) – TABLE CENTERING
 // ==================================================
 const renderLanding = () => `<!DOCTYPE html>
-<html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
-<body style="background-color:#0a0c10; margin:0; height:100vh; overflow:hidden;">
+<html><head>${metaViewport}${fontImport}<style>
+    ${commonStyle}
+    html, body { height: 100%; margin: 0; }
+</style></head>
+<body style="background-color:#0a0c10;">
 
-  <!-- Status matrix: absolute top-left, highest z-index, always visible -->
-  <div class="status-matrix" style="position:absolute; top:15px; left:15px; z-index:10; text-align:left; margin:0;">
-    <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
-    <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
-  </div>
-
-  <!-- Table wrapper for bulletproof vertical centering -->
-  <div style="display:table; width:100%; height:100vh; position:relative; z-index:5;">
-    <div style="display:table-cell; vertical-align:middle; text-align:center; padding:0;">
-
-      <!-- Logo: edge‑to‑edge horizontally, height auto, no scaling distortion -->
-      <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg"
-           alt=""
-           style="width:100%; height:auto; display:block; border:none; margin:0;">
-
-      <!-- Engage button directly below logo with tactical margin -->
-      <button class="btn-tactical"
-              onclick="window.location.href='/boot'"
-              style="margin-top:20px; box-shadow:0px 4px 20px rgba(0,0,0,0.8); display:inline-block;">
-        [ ENGAGE CHANNEL ]
-      </button>
-
-    </div>
-  </div>
+  <!-- Master table: fills window, row 1 = status, row 2 = logo+button -->
+  <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
+    <tr>
+      <!-- Status row – height just enough for the text -->
+      <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
+        <div class="status-matrix" style="margin:0;">
+          <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
+          <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <!-- Content row – fills remaining height, vertically centered -->
+      <td style="vertical-align:middle; text-align:center; padding:0;">
+        <!-- Logo: edge‑to‑edge horizontally -->
+        <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg"
+             alt=""
+             style="width:100%; height:auto; display:block; border:none; margin:0;">
+        <!-- Engage button with tactical gap -->
+        <button class="btn-tactical"
+                onclick="window.location.href='/boot'"
+                style="margin-top:20px; box-shadow:0px 4px 20px rgba(0,0,0,0.8); display:inline-block;">
+          [ ENGAGE CHANNEL ]
+        </button>
+      </td>
+    </tr>
+  </table>
 </body></html>`;
 
 // ==================================================
@@ -154,12 +160,74 @@ const renderChat = (user, room) => {
     <div class="chat-header">
       <span class="ch-label">CH: ${room}</span>
       <span class="conn-status" style="color:${isSecure ? '#39ff14' : '#5c748c'};">${connectionStatusText} ●</span>
+const renderChat = (user, room) => {
+  if (!db[room]) db[room] = [];
+  if (!activeUsers[room]) activeUsers[room] = {};
+
+  activeUsers[room][user] = Date.now();
+  const now = Date.now();
+  let activeCount = 0;
+
+  for (const [op, time] of Object.entries(activeUsers[room])) {
+    if (now - time < HEARTBEAT_MS) activeCount++;
+    else delete activeUsers[room][op];
+  }
+
+  const isSecure = activeCount >= 2;
+  const connectionStatusText = `${activeCount} OPERATORS CONNECTED`;
+
+  const chatHtml = db[room].map(m => `
+    <div style="text-align:${m.sender === user ? 'right' : 'left'}; margin-bottom:10px;">
+      <div style="display:inline-block; background:${m.sender === user ? '#1c2b36' : '#161b22'}; 
+                  padding:12px; border-radius:8px; 
+                  border:1px solid ${m.sender === user ? '#2c4251' : '#2d3748'}; 
+                  text-align:left; max-width:85%; word-wrap:break-word;">
+        <b style="font-size:0.7em; color:#5c748c;">${m.sender}</b><br>
+        <span style="color:#a1b0c0; line-height:1.4;">${m.text}</span>
+      </div>
+    </div>`).join('');
+
+  const encodedExport = Buffer.from(
+    db[room].map(m => `[${m.sender}]: ${m.text}`).join('\n')
+  ).toString('base64');
+
+  return `<!DOCTYPE html>
+<html><head>${metaViewport}${fontImport}<style>
+    ${commonStyle}
+    html, body { height: 100%; margin: 0; }
+    .chat-wrapper { position:relative; width:100%; height:100%; overflow:hidden; background:#0a0c10; }
+    .chat-header { position:absolute; top:0; left:0; right:0; height:50px; 
+                   background:#11151c; border-bottom:1px solid #1f2937; 
+                   padding:0 15px; line-height:50px; z-index:100; }
+    .chat-header .ch-label { float:left; font-size:0.8em; color:#5c748c; }
+    .chat-header .conn-status { float:right; font-size:0.7em; font-weight:bold; letter-spacing:1px; }
+    .chat-messages { position:absolute; top:50px; left:0; right:0; bottom:120px; 
+                     overflow:auto; padding:15px; }
+    .chat-input-bar { position:absolute; bottom:0; left:0; right:0; height:120px; 
+                      background:#11151c; border-top:1px solid #2d3748; 
+                      text-align:center; padding:10px; box-sizing:border-box; z-index:100; }
+    .chat-input-bar form { margin-bottom:10px; }
+    .chat-input-bar input[type="text"] { width:70%; padding:12px; background:#0a0c10; 
+                                         border:1px solid #2d3748; color:#fff; margin-right:5px; 
+                                         box-sizing:border-box; font-size:16px; }
+    .chat-input-bar button[type="submit"] { padding:12px 20px; font-weight:bold; 
+                                            background:#1c2b36; color:#fff; border:1px solid #2d3748; }
+    .chat-links { font-size:0.7em; }
+    .chat-links a { color:#5c748c; text-decoration:none; }
+    .chat-links .kill-link { color:#ff4c4c; font-weight:bold; }
+</style></head>
+<body>
+  <div class="chat-wrapper">
+    <!-- Header -->
+    <div class="chat-header">
+      <span class="ch-label">CH: ${room}</span>
+      <span class="conn-status" style="color:${isSecure ? '#39ff14' : '#5c748c'};">${connectionStatusText} ●</span>
     </div>
 
-    <!-- Scrollable message area -->
+    <!-- Scrollable messages -->
     <div class="chat-messages">${chatHtml}</div>
 
-    <!-- Bottom command bar (absolute bottom) -->
+    <!-- Bottom bar -->
     <div class="chat-input-bar">
       <form method="POST" action="/send">
         <input type="hidden" name="user" value="${user}">
