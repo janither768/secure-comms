@@ -24,7 +24,7 @@ const renderLanding = () => `<!DOCTYPE html>
     <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
     <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
   </div>
-  <img src="https://https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg" alt="STRATSIGNAL" style="max-width:250px; margin-bottom:30px;">
+  <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg" alt="STRATSIGNAL" style="max-width:250px; margin-bottom:30px;">
   
   <button class="btn-tactical" onclick="window.location.href='/boot'">[ ENGAGE CHANNEL ]</button>
 </body></html>`;
