@@ -8,6 +8,7 @@ let db = {};
 let activeUsers = {};
 let roomConstraints = {};
 const HEARTBEAT_MS = 45000;
+const SERVER_START = Date.now();
 
 const metaViewport = `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">`;
 const fontImport = `<link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">`;
@@ -22,32 +23,38 @@ const commonStyle = `
 // ==================================================
 //  PHASE 1: PRE-CHANNEL (LANDING) – TABLE CENTERING
 // ==================================================
-const renderLanding = () => `<!DOCTYPE html>
+const renderLanding = (stats = {}) => {
+  const { totalOps = 0, activeChannels = 0, totalMessages = 0, uptimeStr = '--' } = stats;
+
+  return `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
     ${commonStyle}
     html, body { height: 100%; margin: 0; }
 </style></head>
 <body style="background-color:#0a0c10;">
 
-  <!-- Master table: fills window, row 1 = status, row 2 = logo+button -->
   <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
-      <!-- Status row – height just enough for the text -->
+      <!-- Status row – top-left tactical HUD -->
       <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
-        <div class="status-matrix" style="margin:0;">
-          <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
-          <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
+        <!-- Semi-transparent backdrop for readability -->
+        <div style="background:rgba(10,12,16,0.75); display:inline-block; padding:8px 12px; border-radius:4px; border:1px solid #1f2937;">
+          <div class="status-matrix" style="margin:0;">
+            <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
+            <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
+            <div style="margin-top:8px;">NET_ACTIVE : ${totalOps} OPS // ${activeChannels} CH</div>
+            <div>TRAFFIC   : ${totalMessages} MSG</div>
+            <div>UPTIME    : ${uptimeStr}</div>
+          </div>
         </div>
       </td>
     </tr>
     <tr>
-      <!-- Content row – fills remaining height, vertically centered -->
+      <!-- Content row – logo + button, vertically centered -->
       <td style="vertical-align:middle; text-align:center; padding:0;">
-        <!-- Logo: edge‑to‑edge horizontally -->
         <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg"
              alt=""
              style="width:100%; height:auto; display:block; border:none; margin:0;">
-        <!-- Engage button with tactical gap -->
         <button class="btn-tactical"
                 onclick="window.location.href='/boot'"
                 style="margin-top:20px; box-shadow:0px 4px 20px rgba(0,0,0,0.8); display:inline-block;">
@@ -57,6 +64,7 @@ const renderLanding = () => `<!DOCTYPE html>
     </tr>
   </table>
 </body></html>`;
+};
 
 // ==================================================
 //  PHASE 2: LOGIN – TABLE CENTERING, NO FLEX
@@ -191,13 +199,34 @@ app.post('/login', (req, res) => {
   res.redirect(`/chat?user=${encodeURIComponent(username)}&room=${encodeURIComponent(passcode)}`);
 });
 
-app.get('/chat', (req, res) => {
-  const { user, room } = req.query;
-  const constraints = roomConstraints[room];
-  if (constraints && user !== constraints.target && user !== constraints.creator) {
-    return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+app.get('/', (req, res) => {
+  // Count active operators and channels
+  let totalOps = 0;
+  const now = Date.now();
+  for (const room of Object.keys(activeUsers)) {
+    let roomActive = 0;
+    for (const [op, time] of Object.entries(activeUsers[room])) {
+      if (now - time < HEARTBEAT_MS) roomActive++;
+      else delete activeUsers[room][op];
+    }
+    if (roomActive > 0) totalOps += roomActive;
   }
-  res.send(renderChat(user, room));
+  const activeChannels = Object.keys(db).length;
+
+  // Total messages in memory
+  let totalMessages = 0;
+  for (const room of Object.keys(db)) {
+    totalMessages += db[room].length;
+  }
+
+  // Uptime formatting
+  const uptimeMs = now - SERVER_START;
+  const days = Math.floor(uptimeMs / 86400000);
+  const hours = Math.floor((uptimeMs % 86400000) / 3600000);
+  const minutes = Math.floor((uptimeMs % 3600000) / 60000);
+  const uptimeStr = `${days}D ${String(hours).padStart(2, '0')}H ${String(minutes).padStart(2, '0')}M`;
+
+  res.send(renderLanding({ totalOps, activeChannels, totalMessages, uptimeStr }));
 });
 
 app.post('/send', (req, res) => {
