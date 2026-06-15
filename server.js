@@ -191,7 +191,7 @@ app.get('/chat', (req, res) => {
 app.post('/send', (req, res) => {
   const { user, room, message } = req.body;
   if (!db[room]) db[room] = [];
-  db[room].push({ sender: user, text: message });
+  db[room].push({ sender: user, text: message, timestamp: Date.now() });
   res.redirect(`/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}`);
 });
 
