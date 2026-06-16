@@ -74,7 +74,7 @@ const renderLanding = (stats = {}) => {
     </tr>
     <tr>
       <td style="vertical-align:middle; text-align:center; padding:0;">
-        <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_LOGO-1_8bit.png"
+        <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_LOGO-1_Altered_8bit.png"
              alt=""
              style="width:100%; height:auto; display:block; border:none; margin:0;">
         <!-- Tactical action buttons -->
