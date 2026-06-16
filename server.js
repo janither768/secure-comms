@@ -56,7 +56,7 @@ const renderLanding = (stats = {}) => {
     /* Amber button override for brief */
     .btn-brief { background-color: #B85C00; }
 </style></head>
-<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_LOGO-1_BG.png'); background-size:cover; background-position:center; background-repeat:no-repeat;">
+<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_LOGO-1_BG_Updated.png'); background-size:cover; background-position:center; background-repeat:no-repeat;">
 
   <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
