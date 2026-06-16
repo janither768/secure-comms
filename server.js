@@ -61,7 +61,7 @@ const renderLanding = (stats = {}) => {
   <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
       <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
-        <div style="background:rgba(6,5,5,0.75); display:inline-block; padding:8px 12px; border-radius:0px; border:1px solid #1f2937;">
+        <div style="background:rgba(100,100,100,0.5); display:inline-block; padding:8px 12px; border-radius:0px; border:0px solid #1f2937;">
           <div class="status-matrix" style="margin:0;">
             <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
             <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
