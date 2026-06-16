@@ -7,6 +7,22 @@ app.use(express.urlencoded({ extended: true }));
 let db = {};
 let activeUsers = {};
 let roomConstraints = {};
+
+// Briefs storage (in-memory only)
+let briefs = {};
+let briefCounter = 0; // simple incrementing ID
+
+// Basic HTML escape to prevent XSS
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const HEARTBEAT_MS = 45000;
 const SERVER_START = Date.now();
 
@@ -28,12 +44,13 @@ const renderLanding = (stats = {}) => {
 <html><head>${metaViewport}${fontImport}<style>
     ${commonStyle}
     html, body { height: 100%; margin: 0; }
+    /* Amber button override for brief */
+    .btn-brief { background-color: #B85C00; }
 </style></head>
 <body style="background-color:#0a0c10;">
 
   <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
-      <!-- Status row – top-left tactical HUD with backdrop -->
       <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
         <div style="background:rgba(10,12,16,0.75); display:inline-block; padding:8px 12px; border-radius:4px; border:1px solid #1f2937;">
           <div class="status-matrix" style="margin:0;">
@@ -47,22 +64,28 @@ const renderLanding = (stats = {}) => {
       </td>
     </tr>
     <tr>
-      <!-- Content row – logo + button, vertically centered -->
       <td style="vertical-align:middle; text-align:center; padding:0;">
         <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/prototype02-purge-upgrade-from-'main'/StratSignal-logo-01.jpg"
              alt=""
              style="width:100%; height:auto; display:block; border:none; margin:0;">
-        <button class="btn-tactical"
-                onclick="window.location.href='/boot'"
-                style="margin-top:20px; box-shadow:0px 4px 20px rgba(0,0,0,0.8); display:inline-block;">
-          [ ENGAGE CHANNEL ]
-        </button>
+        <!-- Tactical action buttons -->
+        <div style="margin-top:20px; text-align:center;">
+          <button class="btn-tactical"
+                  onclick="window.location.href='/boot'"
+                  style="box-shadow:0px 4px 20px rgba(0,0,0,0.8); display:inline-block; margin-bottom:10px;">
+            [ ENGAGE CHANNEL ]
+          </button><br>
+          <button class="btn-tactical btn-brief"
+                  onclick="window.location.href='/brief'"
+                  style="box-shadow:0px 4px 20px rgba(0,0,0,0.8); display:inline-block;">
+            [ MISSION BRIEF ]
+          </button>
+        </div>
       </td>
     </tr>
   </table>
 </body></html>`;
 };
-
 // ============ PHASE 2: LOGIN ============
 const renderLogin = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
@@ -87,7 +110,97 @@ const renderLogin = () => `<!DOCTYPE html>
     </div>
   </div>
 </body></html>`;
+// ============ PHASE 2: BRIEF ============
+const renderBriefForm = () => `<!DOCTYPE html>
+<html><head>${metaViewport}${fontImport}<style>
+    ${commonStyle}
+    html, body { height: 100%; margin: 0; }
+    textarea { font-family: monospace; font-size: 16px; }
+</style></head>
+<body style="background-color:#0a0c10; margin:0; height:100%;">
 
+  <div style="display:table; width:100%; height:100%;">
+    <div style="display:table-cell; vertical-align:middle; text-align:center;">
+
+      <form method="POST" action="/brief"
+            style="background:#11151c; padding:20px; border:1px solid #2d3748; 
+                   width:85%; max-width:400px; display:inline-block; text-align:left;
+                   box-sizing:border-box;">
+        <div style="color:#5c748c; font-size:0.7em; margin-bottom:5px;">MISSION NAME</div>
+        <input type="text" name="missionName" required placeholder="OP NIGHTFALL"
+               style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
+                      border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
+
+        <div style="color:#5c748c; font-size:0.7em; margin-bottom:5px;">CHECKPOINTS (one per line)</div>
+        <textarea name="checkpoints" rows="6" required placeholder="LZ Alpha - secure&#10;Ridge Overwatch&#10;Extract Point"
+                  style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
+                         border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; resize:none;"></textarea>
+
+        <button type="submit" class="btn-tactical" style="width:100%; background:#B85C00;">COMPILE BRIEF</button>
+      </form>
+
+    </div>
+  </div>
+</body></html>`;
+// ============ PHASE 3: IN-BRIEF ROUTE PATH ============
+const renderBrief = (id) => {
+  const brief = briefs[id];
+  if (!brief) {
+    return `<!DOCTYPE html><html><head>${metaViewport}<style>${commonStyle}</style></head>
+<body style="background:#0a0c10; color:#a1b0c0;"><div style="padding:20px;">ERR: BRIEF NOT FOUND</div></body></html>`;
+  }
+
+  // Build the path HTML
+  const checkpointsHtml = brief.checkpoints.map(cp => {
+    // cp is already an object { text: "checkpoint - optional note" }
+    return `
+    <div style="position:relative; padding-left:24px; margin-bottom:20px; min-height:20px;">
+      <!-- The dot -->
+      <div style="position:absolute; left:-4px; top:4px; width:8px; height:8px; 
+                  background:#B85C00; border-radius:50%; border:1px solid #1f2937;"></div>
+      <!-- Checkpoint text -->
+      <div style="color:#a1b0c0; font-size:0.9em; line-height:1.4; word-wrap:break-word;">
+        ${escapeHtml(cp.text)}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Status line and control links
+  const statusColor = brief.status === 'ACTIVE' ? '#39ff14' : (brief.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
+  let statusControls = '';
+  if (brief.status === 'PLANNED') {
+    statusControls = ` | <a href="/brief/status/${id}/ACTIVE" style="color:#39ff14; text-decoration:none; font-size:0.7em;">[ ACTIVE ]</a>`;
+  } else if (brief.status === 'ACTIVE') {
+    statusControls = ` | <a href="/brief/status/${id}/COMPLETE" style="color:#5c748c; text-decoration:none; font-size:0.7em;">[ COMPLETE ]</a>`;
+  }
+
+  return `<!DOCTYPE html>
+<html><head>${metaViewport}${fontImport}<style>
+    ${commonStyle}
+    html, body { height: 100%; margin: 0; }
+</style></head>
+<body style="background:#0a0c10; padding-bottom:80px; margin:0;">
+
+  <!-- Header -->
+  <div style="background:#11151c; border-bottom:1px solid #1f2937; padding:15px; margin:0;">
+    <div style="font-size:1em; color:#fff; font-weight:bold;">${escapeHtml(brief.missionName)}</div>
+    <div style="font-size:0.7em; color:${statusColor}; margin-top:4px;">STATUS: ${brief.status}</div>
+  </div>
+
+  <!-- Path container -->
+  <div style="margin:20px 15px; padding-left:10px; border-left:2px solid #2d3748; position:relative;">
+    ${checkpointsHtml}
+  </div>
+
+  <!-- Bottom controls -->
+  <div style="position:fixed; bottom:0; left:0; right:0; background:#11151c; border-top:1px solid #2d3748; 
+              padding:10px; text-align:center; z-index:100; box-sizing:border-box; font-size:0.7em;">
+    <a href="/brief" style="color:#5c748c; text-decoration:none;">[ NEW BRIEF ]</a>${statusControls}
+    <span style="color:#2d3748; margin:0 5px;">|</span>
+    <a href="/brief/kill/${id}" style="color:#ff4c4c; text-decoration:none; font-weight:bold;">[ KILL ]</a>
+  </div>
+</body></html>`;
+};
 // ============ PHASE 3: IN-CHANNEL (CHAT WITH TIMESTAMPS) ============
 const renderChat = (user, room) => {
   if (!db[room]) db[room] = [];
@@ -224,6 +337,70 @@ app.get('/purge', (req, res) => {
   const { room } = req.query;
   delete db[room];
   delete roomConstraints[room];
+  res.redirect('/');
+});
+
+// --- Mission Brief Routes ---
+
+// Show brief creation form
+app.get('/brief', (req, res) => {
+  res.send(renderBriefForm());
+});
+
+// Handle form submission – create a new brief
+app.post('/brief', (req, res) => {
+  const { missionName, checkpoints } = req.body;
+  if (!missionName || !checkpoints) {
+    return res.redirect('/brief');
+  }
+
+  // Split checkpoints by newline, trim, and filter empty lines
+  const points = checkpoints
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .map(text => ({ text })); // store as simple object for future expansion
+
+  if (points.length === 0) {
+    return res.redirect('/brief');
+  }
+
+  const id = ++briefCounter;
+  briefs[id] = {
+    missionName: missionName.trim(),
+    checkpoints: points,
+    status: 'PLANNED',
+    created: Date.now()
+  };
+
+  res.redirect(`/brief/${id}`);
+});
+
+// View a specific brief
+app.get('/brief/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  res.send(renderBrief(id));
+});
+
+// Update brief status
+app.get('/brief/status/:id/:status', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const newStatus = req.params.status;
+  if (!briefs[id]) return res.redirect('/');
+
+  // Only allow valid transitions
+  if (briefs[id].status === 'PLANNED' && newStatus === 'ACTIVE') {
+    briefs[id].status = 'ACTIVE';
+  } else if (briefs[id].status === 'ACTIVE' && newStatus === 'COMPLETE') {
+    briefs[id].status = 'COMPLETE';
+  }
+  res.redirect(`/brief/${id}`);
+});
+
+// Kill (delete) a brief
+app.get('/brief/kill/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  delete briefs[id];
   res.redirect('/');
 });
 
