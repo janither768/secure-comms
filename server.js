@@ -81,12 +81,12 @@ const renderLanding = (stats = {}) => {
         <div style="margin-top:20px; text-align:center;">
           <button class="btn-tactical"
                   onclick="window.location.href='/boot'"
-                  style="box-shadow:0px 4px 20px rgba(0,0,0,0.8); display:inline-block; margin-bottom:10px;">
+                  style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block; margin-bottom:10px;">
             [ ENGAGE CHANNEL ]
           </button><br>
           <button class="btn-tactical btn-brief"
                   onclick="window.location.href='/brief'"
-                  style="box-shadow:0px 4px 20px rgba(0,0,0,0.8); display:inline-block;">
+                  style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block;">
             [ MISSION BRIEF ]
           </button>
         </div>
