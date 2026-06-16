@@ -340,8 +340,7 @@ const renderChat = (user, room) => {
     html, body { height: 100%; margin: 0; }
     input { font-size: 16px; }
 </style></head>
-<body style="padding-bottom:150px; padding-top:60px; background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_BG_NO_TEXT.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; margin:0;">
-
+<body style="padding-bottom:150px; padding-top:60px; background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_BG_NO_TEXT.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0;">
   <div style="position:fixed; top:0; left:0; right:0; background:#11151c; border-bottom:1px solid #1f2937; 
               padding:15px; display:block; z-index:100; box-sizing:border-box;">
     <span style="float:left; font-size:0.8em; color:#5c748c;">CH: ${room}</span>
