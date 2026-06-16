@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }));
 let db = {};
 let activeUsers = {};
 let roomConstraints = {};
-
+const HEARTBEAT_MS = 45000;
 // Briefs storage (in-memory only)
 let briefs = {};
 let briefCounter = 0; // simple incrementing ID
@@ -22,8 +22,17 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
-
-const HEARTBEAT_MS = 45000;
+const SCALE = 100; // 1 grid cell = 100 meters
+const dirVectors = {
+  N:  { dx: 0,  dy: -1 },
+  NE: { dx: 1,  dy: -1 },
+  E:  { dx: 1,  dy: 0 },
+  SE: { dx: 1,  dy: 1 },
+  S:  { dx: 0,  dy: 1 },
+  SW: { dx: -1, dy: 1 },
+  W:  { dx: -1, dy: 0 },
+  NW: { dx: -1, dy: -1 }
+};
 const SERVER_START = Date.now();
 
 const metaViewport = `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">`;
@@ -131,8 +140,14 @@ const renderBriefForm = () => `<!DOCTYPE html>
                style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
                       border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
 
-        <div style="color:#5c748c; font-size:0.7em; margin-bottom:5px;">CHECKPOINTS (one per line)</div>
-        <textarea name="checkpoints" rows="6" required placeholder="LZ Alpha - secure&#10;Ridge Overwatch&#10;Extract Point"
+        <div style="color:#5c748c; font-size:0.7em; margin-bottom:5px;">
+          CHECKPOINTS – one per line<br>
+          Format: <b>NAME DIRECTION DISTANCE</b><br>
+          (Direction: N, NE, E, SE, S, SW, W, NW)<br>
+          Scale: 1 cell = ${SCALE}m
+        </div>
+        <textarea name="checkpoints" rows="6" required
+                  placeholder="LZ Alpha NE 300&#10;Ridge Overwatch E 500&#10;Extract Point SE 200"
                   style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
                          border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; resize:none;"></textarea>
 
@@ -150,22 +165,107 @@ const renderBrief = (id) => {
 <body style="background:#0a0c10; color:#a1b0c0;"><div style="padding:20px;">ERR: BRIEF NOT FOUND</div></body></html>`;
   }
 
-  // Build the path HTML
-  const checkpointsHtml = brief.checkpoints.map(cp => {
-    // cp is already an object { text: "checkpoint - optional note" }
-    return `
-    <div style="position:relative; padding-left:24px; margin-bottom:20px; min-height:20px;">
-      <!-- The dot -->
-      <div style="position:absolute; left:-4px; top:4px; width:8px; height:8px; 
-                  background:#B85C00; border-radius:50%; border:1px solid #1f2937;"></div>
-      <!-- Checkpoint text -->
-      <div style="color:#a1b0c0; font-size:0.9em; line-height:1.4; word-wrap:break-word;">
-        ${escapeHtml(cp.text)}
-      </div>
-    </div>`;
-  }).join('');
+  const points = brief.points;
+  if (!points || points.length === 0) {
+    return `<!DOCTYPE html><html><head>${metaViewport}<style>${commonStyle}</style></head>
+<body style="background:#0a0c10; color:#a1b0c0;"><div style="padding:20px;">ERR: NO CHECKPOINTS</div></body></html>`;
+  }
 
-  // Status line and control links
+  // ---- BUILD GRID ----
+  // 1. Determine bounding box from points, then expand for labels
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const p of points) {
+    minX = Math.min(minX, p.x);
+    maxX = Math.max(maxX, p.x);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y);
+  }
+
+  // 2. Prepare labels for each point
+  const labels = points.map(p => {
+    const raw = p.name === 'HQ' ? 'HQ' : p.name.substring(0, 8);
+    return `[${raw}]`;
+  });
+
+  // Expand bounding box to fit labels (placed to the right of the point)
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    const label = labels[i];
+    const labelStartX = p.x + 1;
+    const labelEndX = labelStartX + label.length - 1;
+    minX = Math.min(minX, labelStartX);
+    maxX = Math.max(maxX, labelEndX);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y);
+  }
+
+  // Add margin
+  minX -= 2; maxX += 2;
+  minY -= 1; maxY += 1;
+
+  const width = maxX - minX + 1;
+  const height = maxY - minY + 1;
+
+  // Offset function
+  const ox = -minX;
+  const oy = -minY;
+
+  // Create 2D grid filled with spaces
+  const grid = Array(height).fill().map(() => Array(width).fill(' '));
+
+  // 3. Draw lines between consecutive points
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i];
+    const b = points[i+1];
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const steps = Math.max(Math.abs(dx), Math.abs(dy));
+    if (steps === 0) continue;
+
+    const sx = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
+    const sy = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
+
+    // Determine line character based on slope
+    let char = '─';
+    if (sx !== 0 && sy !== 0) {
+      // diagonal
+      char = (sx * sy === 1) ? '╲' : '╱'; // positive slope -> ╲, negative -> ╱
+    } else if (sx !== 0) {
+      char = '─';
+    } else if (sy !== 0) {
+      char = '│';
+    }
+
+    // Draw from a to b, including the endpoint cells (they'll be overwritten by labels later)
+    for (let step = 1; step <= steps; step++) {
+      const cx = a.x + sx * step;
+      const cy = a.y + sy * step;
+      const gx = cx + ox;
+      const gy = cy + oy;
+      if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
+        grid[gy][gx] = char;
+      }
+    }
+  }
+
+  // 4. Overlay labels (start point HQ and checkpoints)
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    const label = labels[i];
+    let lx = p.x + 1 + ox; // one cell right of the point
+    let ly = p.y + oy;
+    for (let c = 0; c < label.length; c++) {
+      const col = lx + c;
+      if (ly >= 0 && ly < height && col >= 0 && col < width) {
+        grid[ly][col] = label[c];
+      }
+    }
+  }
+
+  // Convert grid to string
+  const mapText = grid.map(row => row.join('')).join('\n');
+
+  // ---- STATUS & CONTROLS ----
   const statusColor = brief.status === 'ACTIVE' ? '#39ff14' : (brief.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
   let statusControls = '';
   if (brief.status === 'PLANNED') {
@@ -178,6 +278,7 @@ const renderBrief = (id) => {
 <html><head>${metaViewport}${fontImport}<style>
     ${commonStyle}
     html, body { height: 100%; margin: 0; }
+    pre { font-family: monospace; font-size: 11px; line-height: 1.2; white-space: pre; overflow: auto; padding: 10px; background: #0a0c10; color: #a1b0c0; border: 1px solid #1f2937; margin: 15px; }
 </style></head>
 <body style="background:#0a0c10; padding-bottom:80px; margin:0;">
 
@@ -187,10 +288,8 @@ const renderBrief = (id) => {
     <div style="font-size:0.7em; color:${statusColor}; margin-top:4px;">STATUS: ${brief.status}</div>
   </div>
 
-  <!-- Path container -->
-  <div style="margin:20px 15px; padding-left:10px; border-left:2px solid #2d3748; position:relative;">
-    ${checkpointsHtml}
-  </div>
+  <!-- ASCII Grid Map -->
+  <pre>${mapText}</pre>
 
   <!-- Bottom controls -->
   <div style="position:fixed; bottom:0; left:0; right:0; background:#11151c; border-top:1px solid #2d3748; 
@@ -350,25 +449,41 @@ app.get('/brief', (req, res) => {
 // Handle form submission – create a new brief
 app.post('/brief', (req, res) => {
   const { missionName, checkpoints } = req.body;
-  if (!missionName || !checkpoints) {
-    return res.redirect('/brief');
+  if (!missionName || !checkpoints) return res.redirect('/brief');
+
+  const lines = checkpoints.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  if (lines.length === 0) return res.redirect('/brief');
+
+  const points = [{ name: 'HQ', x: 0, y: 0 }];
+  let prevX = 0, prevY = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const parts = lines[i].split(/\s+/);
+    if (parts.length < 3) continue; // skip invalid lines
+    const name = parts[0];
+    const dir = parts[1].toUpperCase();
+    const dist = parseInt(parts[2], 10);
+
+    if (!dirVectors[dir] || isNaN(dist) || dist <= 0) continue;
+
+    const steps = Math.round(dist / SCALE);
+    if (steps < 1) continue;
+
+    const vec = dirVectors[dir];
+    const newX = prevX + vec.dx * steps;
+    const newY = prevY + vec.dy * steps;
+
+    points.push({ name: i === lines.length - 1 ? name : name, x: newX, y: newY });
+    prevX = newX;
+    prevY = newY;
   }
 
-  // Split checkpoints by newline, trim, and filter empty lines
-  const points = checkpoints
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .map(text => ({ text })); // store as simple object for future expansion
-
-  if (points.length === 0) {
-    return res.redirect('/brief');
-  }
+  if (points.length <= 1) return res.redirect('/brief'); // at least one checkpoint needed
 
   const id = ++briefCounter;
   briefs[id] = {
     missionName: missionName.trim(),
-    checkpoints: points,
+    points: points,          // array of { name, x, y }
     status: 'PLANNED',
     created: Date.now()
   };
