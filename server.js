@@ -98,7 +98,7 @@ const renderLanding = (stats = {}) => {
 // ============ PHASE 2: LOGIN ============
 const renderLogin = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
-<body style="background-color:#0a0c10; margin:0; height:100vh;">
+<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_LOGO-1_BG_Updated.png'); background-size:cover; background-position:center; background-repeat:no-repeat; margin:0; height:100vh;">
   <div style="display:table; width:100%; height:100%;">
     <div style="display:table-cell; vertical-align:middle; text-align:center;">
       <form method="POST" action="/login"
@@ -106,14 +106,17 @@ const renderLogin = () => `<!DOCTYPE html>
                    width:85%; max-width:320px; display:inline-block; text-align:left;
                    box-sizing:border-box;">
         <input type="text" name="username" placeholder="Callsign" required
-               style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
-                      border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
+       style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
+              border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
+              font-family: 'Michroma', sans-serif;">
         <input type="password" name="passcode" placeholder="Channel" required
-               style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
-                      border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
+       style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
+              border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
+              font-family: 'Michroma', sans-serif;">
         <input type="text" name="target" placeholder="Target Alias (Optional)"
-               style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
-                      border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
+       style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
+              border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
+              font-family: 'Michroma', sans-serif;">
         <button type="submit" class="btn-tactical" style="width:100%;">INITIALIZE</button>
       </form>
     </div>
