@@ -171,8 +171,7 @@ const renderBrief = (id) => {
 <body style="background:#0a0c10; color:#a1b0c0;"><div style="padding:20px;">ERR: NO CHECKPOINTS</div></body></html>`;
   }
 
-  // ---- BUILD GRID ----
-  // 1. Determine bounding box from points, then expand for labels
+  // ---- BUILD GRID (exact same code as before) ----
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   for (const p of points) {
     minX = Math.min(minX, p.x);
@@ -181,13 +180,11 @@ const renderBrief = (id) => {
     maxY = Math.max(maxY, p.y);
   }
 
-  // 2. Prepare labels for each point
   const labels = points.map(p => {
     const raw = p.name === 'HQ' ? 'HQ' : p.name.substring(0, 8);
     return `[${raw}]`;
   });
 
-  // Expand bounding box to fit labels (placed to the right of the point)
   for (let i = 0; i < points.length; i++) {
     const p = points[i];
     const label = labels[i];
@@ -199,21 +196,17 @@ const renderBrief = (id) => {
     maxY = Math.max(maxY, p.y);
   }
 
-  // Add margin
   minX -= 2; maxX += 2;
   minY -= 1; maxY += 1;
 
   const width = maxX - minX + 1;
   const height = maxY - minY + 1;
 
-  // Offset function
   const ox = -minX;
   const oy = -minY;
 
-  // Create 2D grid filled with spaces
   const grid = Array(height).fill().map(() => Array(width).fill(' '));
 
-  // 3. Draw lines between consecutive points
   for (let i = 0; i < points.length - 1; i++) {
     const a = points[i];
     const b = points[i+1];
@@ -225,18 +218,15 @@ const renderBrief = (id) => {
     const sx = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
     const sy = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
 
-    // Determine line character based on slope
     let char = '─';
     if (sx !== 0 && sy !== 0) {
-      // diagonal
-      char = (sx * sy === 1) ? '╲' : '╱'; // positive slope -> ╲, negative -> ╱
+      char = (sx * sy === 1) ? '╲' : '╱';
     } else if (sx !== 0) {
       char = '─';
     } else if (sy !== 0) {
       char = '│';
     }
 
-    // Draw from a to b, including the endpoint cells (they'll be overwritten by labels later)
     for (let step = 1; step <= steps; step++) {
       const cx = a.x + sx * step;
       const cy = a.y + sy * step;
@@ -248,11 +238,10 @@ const renderBrief = (id) => {
     }
   }
 
-  // 4. Overlay labels (start point HQ and checkpoints)
   for (let i = 0; i < points.length; i++) {
     const p = points[i];
     const label = labels[i];
-    let lx = p.x + 1 + ox; // one cell right of the point
+    let lx = p.x + 1 + ox;
     let ly = p.y + oy;
     for (let c = 0; c < label.length; c++) {
       const col = lx + c;
@@ -262,10 +251,8 @@ const renderBrief = (id) => {
     }
   }
 
-  // Convert grid to string
   const mapText = grid.map(row => row.join('')).join('\n');
 
-  // ---- STATUS & CONTROLS ----
   const statusColor = brief.status === 'ACTIVE' ? '#39ff14' : (brief.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
   let statusControls = '';
   if (brief.status === 'PLANNED') {
@@ -278,7 +265,6 @@ const renderBrief = (id) => {
 <html><head>${metaViewport}${fontImport}<style>
     ${commonStyle}
     html, body { height: 100%; margin: 0; }
-    pre { font-family: monospace; font-size: 11px; line-height: 1.2; white-space: pre; overflow: auto; padding: 10px; background: #0a0c10; color: #a1b0c0; border: 1px solid #1f2937; margin: 15px; }
 </style></head>
 <body style="background:#0a0c10; padding-bottom:80px; margin:0;">
 
@@ -288,8 +274,10 @@ const renderBrief = (id) => {
     <div style="font-size:0.7em; color:${statusColor}; margin-top:4px;">STATUS: ${brief.status}</div>
   </div>
 
-  <!-- ASCII Grid Map -->
-  <pre>${mapText}</pre>
+  <!-- ASCII Grid Map (HTC‑safe scrolling wrapper) -->
+  <div style="overflow-x:auto; width:100%; margin:15px 0; padding:0;">
+    <pre style="margin:0; display:inline-block; white-space:pre; font-family:monospace; font-size:11px; line-height:1.2; color:#a1b0c0; background:#0a0c10; border:1px solid #1f2937; padding:10px;">${mapText}</pre>
+  </div>
 
   <!-- Bottom controls -->
   <div style="position:fixed; bottom:0; left:0; right:0; background:#11151c; border-top:1px solid #2d3748; 
