@@ -56,12 +56,12 @@ const renderLanding = (stats = {}) => {
     /* Amber button override for brief */
     .btn-brief { background-color: #B85C00; }
 </style></head>
-<body style="background-color:#0a0c10;">
+<body style="background-color:#060505;">
 
   <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
       <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
-        <div style="background:rgba(6,5,5,0.75); display:inline-block; padding:8px 12px; border-radius:4px; border:1px solid #1f2937;">
+        <div style="background:rgba(6,5,5,0.75); display:inline-block; padding:8px 12px; border-radius:0px; border:1px solid #1f2937;">
           <div class="status-matrix" style="margin:0;">
             <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
             <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
