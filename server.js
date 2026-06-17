@@ -389,12 +389,18 @@ const renderChat = (user, room) => {
              style="width:70%; padding:12px; background:#0a0c10; border:1px solid #2d3748; color:#fff; margin-right:5px; box-sizing:border-box; font-size:16px;">
       <button type="submit" style="padding:12px 20px; font-weight:bold; background:#1c2b36; color:#fff; border:1px solid #2d3748;">&gt;</button>
     </form>
-    <div style="font-size:0.7em;">
-      <a href="data:text/plain;base64,${encodedExport}" download="chat.txt" style="color:#5c748c; text-decoration:none;">[ CONVO DOWNLOAD ]</a>
+    <div style="font-size:0.7em; line-height:1.8;">
+      <a href="data:text/plain;base64,${encodedExport}" download="chat.txt" 
+         style="color:#5c748c; text-decoration:none; background:rgba(92,116,140,0.15); padding:2px 6px; border-radius:3px;">[ CONVO DOWNLOAD ]</a>
       <span style="color:#2d3748; margin:0 3px;">|</span>
-      <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}" style="color:#5c748c; text-decoration:none;">[ PING ]</a>
+      <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}" 
+         style="color:#5c748c; text-decoration:none; background:rgba(92,116,140,0.15); padding:2px 6px; border-radius:3px;">[ PING ]</a>
       <span style="color:#2d3748; margin:0 3px;">|</span>
-      <a href="/purge?room=${encodeURIComponent(room)}" style="color:#ff4c4c; text-decoration:none; font-weight:bold;">[ KILL ]</a>
+      <a href="/purge?room=${encodeURIComponent(room)}" 
+         style="color:#ff4c4c; text-decoration:none; font-weight:bold; background:rgba(255,76,76,0.15); padding:2px 6px; border-radius:3px;">[ KILL ]</a>
+      <span style="color:#2d3748; margin:0 3px;">|</span>
+      <a href="/boot" 
+         style="color:#83EC2D; text-decoration:none; background:rgba(131,236,45,0.15); padding:2px 6px; border-radius:3px;">[ CHANGE CHANNEL ]</a>
     </div>
   </div>
 <!-- Blinking green dot -->
