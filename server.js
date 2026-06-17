@@ -390,6 +390,18 @@ const renderChat = (user, room) => {
       <a href="/purge?room=${encodeURIComponent(room)}" style="color:#ff4c4c; text-decoration:none; font-weight:bold;">[ KILL ]</a>
     </div>
   </div>
+<!-- Blinking green dot -->
+<script>
+(function() {
+  var dot = document.getElementById('conn-dot');
+  if (!dot) return;
+  var visible = true;
+  setInterval(function() {
+    visible = !visible;
+    dot.style.opacity = visible ? '1' : '0.15';
+  }, 500);
+})();
+</script>
 </body></html>`;
 };
 
