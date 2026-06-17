@@ -349,6 +349,8 @@ const renderChat = (user, room) => {
 
   <div style="padding:15px;">
     ${chatHtml}
+    <!-- Spacer to clear the fixed bottom dock -->
+    <div style="height: 120px;"></div>
   </div>
 
   <div style="position:fixed; bottom:0; left:0; right:0; background:#11151c; border-top:1px solid #2d3748; 
