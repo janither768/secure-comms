@@ -38,7 +38,7 @@ const SERVER_START = Date.now();
 const metaViewport = `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">`;
 const fontImport = `<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">`;
 const commonStyle = `
-  body { background-color: #060505; font-family: Michroma; color: #a1b0c0; margin: 0; }
+  body { background-color: #060505; font-family: 'Lato', sans-serif; color: #a1b0c0; margin: 0; }
   .btn-tactical { background-color: #5D3FD3; color: white; border: none; padding: 12px 24px; cursor: pointer; font-family: 'Michroma', sans-serif; text-transform: uppercase; font-weight: bold; }
   .status-matrix { color: #5c748c; font-family: monospace; font-size: 0.75em; }
   input { font-size: 16px; }
