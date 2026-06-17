@@ -344,7 +344,7 @@ const renderChat = (user, room) => {
                   border:1px solid ${m.sender === user ? '#2c4251' : '#2d3748'}; 
                   text-align:left; max-width:85%; word-wrap:break-word;">
         <b style="font-size:0.7em; color:#5c748c;">${m.sender}</b><br>
-        <span style="color:#a1b0c0; line-height:1.4; font-family: monospace;">${m.text}</span>
+        <span style="color:#a1b0c0; line-height:1.4; font-family: lato;">${m.text}</span>
         ${timeStr ? `<div style="font-size:0.6em; color:#4a5b6b; margin-top:4px; text-align:right; font-family: monospace;">${timeStr}</div>` : ''}
       </div>
     </div>`;
@@ -362,7 +362,7 @@ const renderChat = (user, room) => {
     html, body { height: 100%; margin: 0; }
     input { font-size: 16px; }
 </style></head>
-<body style="padding-bottom:180px; padding-top:60px; background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_BG_NO_TEXT.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0;"> 
+<body style="padding-bottom:180px; padding-top:60px; background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/LOGO1_MissionBrief.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0;"> 
 <div style="position:fixed; top:0; left:0; right:0; background:#11151c; border-bottom:1px solid #1f2937; 
               padding:15px; z-index:100; box-sizing:border-box;">
     <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
@@ -385,8 +385,8 @@ const renderChat = (user, room) => {
     <form method="POST" action="/send" style="margin-bottom:10px; display:block; text-align:center;">
       <input type="hidden" name="user" value="${user}">
       <input type="hidden" name="room" value="${room}">
-      <input type="text" name="message" required placeholder="Transmit..." 
-             style="width:70%; padding:12px; background:#0a0c10; border:1px solid #2d3748; color:#fff; margin-right:5px; box-sizing:border-box; font-size:16px;">
+      <input type="text" name="message" required placeholder="Enter Transmition" 
+             style="width:70%; padding:12px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-family: lato; margin-right:5px; box-sizing:border-box; font-size:16px;">
       <button type="submit" style="padding:12px 20px; font-weight:bold; background:#1c2b36; color:#fff; border:1px solid #2d3748;">&gt;</button>
     </form>
     <div style="font-size:0.7em; line-height:1.8;">
