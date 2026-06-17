@@ -350,7 +350,7 @@ const renderChat = (user, room) => {
     </div>`;
   }).join('');
 
-  const utcTimeStr = new Date().toISOString().substring(11, 8); // HH:MM:SS for Last Ping
+  const utcTimeStr = new Date().toISOString().slice(11, 19); // HH:MM:SS for Last Ping
 
   const encodedExport = Buffer.from(
     db[room].map(m => `[${m.sender}]: ${m.text}`).join('\n')
