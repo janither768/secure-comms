@@ -340,12 +340,12 @@ const renderChat = (user, room) => {
     return `
     <div style="text-align:${m.sender === user ? 'right' : 'left'}; margin-bottom:10px;">
       <div style="display:inline-block; background:${m.sender === user ? '#1c2b36' : '#161b22'}; 
-                  padding:12px; border-radius:8px; 
+                  padding:12px; border-radius:2px; 
                   border:1px solid ${m.sender === user ? '#2c4251' : '#2d3748'}; 
                   text-align:left; max-width:85%; word-wrap:break-word;">
         <b style="font-size:0.7em; color:#5c748c;">${m.sender}</b><br>
-        <span style="color:#a1b0c0; line-height:1.4;">${m.text}</span>
-        ${timeStr ? `<div style="font-size:0.6em; color:#4a5b6b; margin-top:4px; text-align:right;">${timeStr}</div>` : ''}
+        <span style="color:#a1b0c0; line-height:1.4; font-family: monospace;">${m.text}</span>
+        ${timeStr ? `<div style="font-size:0.6em; color:#4a5b6b; margin-top:4px; text-align:right; font-family: monospace;">${timeStr}</div>` : ''}
       </div>
     </div>`;
   }).join('');
