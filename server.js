@@ -129,13 +129,13 @@ const renderBriefForm = () => `<!DOCTYPE html>
     html, body { height: 100%; margin: 0; }
     textarea { font-family: monospace; font-size: 16px; }
 </style></head>
-<body style="background-color:#0a0c10; margin:0; height:100%;">
+<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/LOGO1_MissionBrief.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; margin:0; height:100%;">
 
   <div style="display:table; width:100%; height:100%;">
     <div style="display:table-cell; vertical-align:middle; text-align:center;">
 
       <form method="POST" action="/brief"
-            style="background:#11151c; padding:20px; border:1px solid #2d3748; 
+            style="background:#11151c; padding:20px; border:0px solid #2d3748; 
                    width:85%; max-width:400px; display:inline-block; text-align:left;
                    box-sizing:border-box;">
         <div style="color:#5c748c; font-size:0.7em; margin-bottom:5px;">MISSION NAME</div>
