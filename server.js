@@ -127,15 +127,15 @@ const renderLogin = () => `<!DOCTYPE html>
         <input type="text" name="username" placeholder="Callsign" required
        style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
               border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
-              font-family: 'Michroma', sans-serif;">
+              font-family: 'Lato', sans-serif;">
         <input type="password" name="passcode" placeholder="Channel" required
        style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
               border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
-              font-family: 'Michroma', sans-serif;">
+              font-family: 'Lato', sans-serif;">
         <input type="text" name="target" placeholder="Target Alias (Optional)"
        style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
               border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
-              font-family: 'Michroma', sans-serif;">
+              font-family: 'Lato', sans-serif;">
         <button type="submit" class="btn-tactical" style="width:100%;">INITIALIZE</button>
       </form>
     </div>
