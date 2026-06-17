@@ -63,12 +63,32 @@ const renderLanding = (stats = {}) => {
       <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
         <div style="background:rgba(6,5,5,0.5); display:inline-block; padding:8px 12px; border-radius:0px; border:0px solid #1f2937;">
           <div class="status-matrix" style="margin:0;">
-            <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
-            <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
-            <div style="margin-top:8px;">NET_ACTIVE : ${totalOps} OPS // ${activeChannels} CH</div>
-            <div>TRAFFIC   : ${totalMessages} MSG</div>
-            <div>UPTIME    : ${uptimeStr}</div>
-          </div>
+  <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
+  <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
+  <div style="margin-top:8px;">NET_ACTIVE : ${totalOps} OPS // ${activeChannels} CH</div>
+  <div>TRAFFIC   : ${totalMessages} MSG</div>
+  <div>UPTIME    : ${uptimeStr}</div>
+  <div style="margin-top:8px;">ZULU TIME : <span id="zulu">--:--:--</span></div>
+</div>
+
+<!-- Live ZULU clock (blinking colon) -->
+<script>
+(function() {
+  var el = document.getElementById('zulu');
+  if (!el) return;
+  function tick() {
+    var d = new Date();
+    var h = String(d.getUTCHours()).padStart(2,'0');
+    var m = String(d.getUTCMinutes()).padStart(2,'0');
+    var s = String(d.getUTCSeconds()).padStart(2,'0');
+    // Blinking colon: hide colon on even seconds
+    var sep = (d.getUTCSeconds() % 2 === 0) ? ':' : ' ';
+    el.textContent = h + sep + m + ':' + s;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
         </div>
       </td>
     </tr>
