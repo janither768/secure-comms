@@ -400,7 +400,7 @@ const renderChat = (user, room) => {
          style="color:#ff4c4c; text-decoration:none; font-weight:bold; background:rgba(255,76,76,0.15); padding:2px 6px; border-radius:3px;">[ KILL ]</a>
       <span style="color:#2d3748; margin:0 3px;">|</span>
       <a href="/boot" 
-         style="color:#83EC2D; text-decoration:none; background:rgba(131,236,45,0.15); padding:2px 6px; border-radius:3px;">[ CHANGE CHANNEL ]</a>
+         style="color:#83EC2D; text-decoration:none; background:rgba(131,236,45,0.15); padding:2px 6px; border-radius:3px;">[ SWAP ]</a>
     </div>
   </div>
 <!-- Blinking green dot -->
