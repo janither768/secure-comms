@@ -363,7 +363,7 @@ const renderChat = (user, room) => {
 <body style="padding-bottom:180px; padding-top:60px; background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_BG_NO_TEXT.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0;">  <div style="position:fixed; top:0; left:0; right:0; background:#11151c; border-bottom:1px solid #1f2937; 
               padding:15px; display:block; z-index:100; box-sizing:border-box;">
     <span style="float:left; font-size:0.8em; color:#5c748c;">CH: ${room}</span>
-    <span style="float:right; font-size:0.7em; color:${isSecure ? '#39ff14' : '#5c748c'}; font-weight:bold; letter-spacing:1px;">${connectionStatusText} ●</span>
+    <span style="float:right; font-size:0.7em; color:${isSecure ? '#39ff14' : '#5c748c'}; font-weight:bold; letter-spacing:1px;">${connectionStatusText} <span id="conn-dot" style="color:inherit;">●</span></span>
     <div style="clear:both;"></div>
   </div>
 
