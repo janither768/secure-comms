@@ -350,6 +350,8 @@ const renderChat = (user, room) => {
     </div>`;
   }).join('');
 
+  const utcTimeStr = new Date().toISOString().substring(11, 8); // HH:MM:SS for Last Ping
+
   const encodedExport = Buffer.from(
     db[room].map(m => `[${m.sender}]: ${m.text}`).join('\n')
   ).toString('base64');
@@ -360,11 +362,16 @@ const renderChat = (user, room) => {
     html, body { height: 100%; margin: 0; }
     input { font-size: 16px; }
 </style></head>
-<body style="padding-bottom:180px; padding-top:60px; background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_BG_NO_TEXT.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0;">  <div style="position:fixed; top:0; left:0; right:0; background:#11151c; border-bottom:1px solid #1f2937; 
-              padding:15px; display:block; z-index:100; box-sizing:border-box;">
-    <span style="float:left; font-size:0.8em; color:#5c748c;">CH: ${room}</span>
-    <span style="float:right; font-size:0.7em; color:${isSecure ? '#39ff14' : '#5c748c'}; font-weight:bold; letter-spacing:1px;">${connectionStatusText} <span id="conn-dot" style="color:inherit;">●</span></span>
-    <div style="clear:both;"></div>
+<body style="padding-bottom:180px; padding-top:60px; background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_BG_NO_TEXT.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0;"> 
+<div style="position:fixed; top:0; left:0; right:0; background:#11151c; border-bottom:1px solid #1f2937; 
+              padding:15px; z-index:100; box-sizing:border-box;">
+    <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+      <tr>
+        <td style="text-align:left; font-size:0.8em; color:#5c748c;">CH: ${room}</td>
+        <td style="text-align:center; font-size:0.7em; color:#5c748c;">LAST PING: ${utcTimeStr}</td>
+        <td style="text-align:right; font-size:0.7em; color:${isSecure ? '#39ff14' : '#5c748c'}; font-weight:bold; letter-spacing:1px;">${connectionStatusText} <span id="conn-dot" style="color:inherit;">●</span></td>
+      </tr>
+    </table>
   </div>
 
   <div style="padding:15px;">
@@ -400,6 +407,24 @@ const renderChat = (user, room) => {
     visible = !visible;
     dot.style.opacity = visible ? '1' : '0.15';
   }, 500);
+})();
+</script>
+
+<!-- Auto-ping after 1 min idle -->
+<script>
+(function() {
+  var input = document.querySelector('input[name="message"]');
+  var timer;
+  function reset() {
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+      location.reload();
+    }, 60000);
+  }
+  if (input) {
+    input.addEventListener('keydown', reset);
+    reset(); // start the countdown
+  }
 })();
 </script>
 </body></html>`;
