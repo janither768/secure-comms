@@ -117,7 +117,7 @@ const renderLanding = (stats = {}) => {
 // ============ PHASE 2: LOGIN ============
 const renderLogin = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
-<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/STRATSIGNAL_BG_NO_TEXT.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; margin:0; height:100vh;">
+<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat; margin:0; height:100vh;">
   <div style="display:table; width:100%; height:100%;">
     <div style="display:table-cell; vertical-align:middle; text-align:center;">
       <form method="POST" action="/login"
