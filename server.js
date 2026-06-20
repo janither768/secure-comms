@@ -237,7 +237,7 @@ stratsignal:/tac_ops/comms $ █</pre>
 
                 <!-- Full-width image backdrop behind field manual -->
         <div style="position:relative; width:100vw; margin-left:calc(-50vw + 50%); margin-top:25px;">
-          <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/The%20scrolling%20BG%20Trasnparent.png" 
+          <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/The%20scrolling%20BG%20Trasnparent%202.png" 
                style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;" alt="">
           
           <!-- Manual text (centered, same width as logo, no background) -->
