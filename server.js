@@ -97,10 +97,29 @@ const renderLanding = (stats = {}) => {
     </tr>
     <tr>
       <td style="vertical-align:middle; text-align:center; padding:0;">
-        <!-- Vertical scrolling terminal (same width as logo) -->
-<div style="width:240px; max-width:80%; margin:0 auto 15px auto; height:180px; overflow:hidden; background:#0a0c10; border:1px solid #2d3748; font-family:monospace; font-size:10px; line-height:1.3; color:#39ff14; position:relative;">
+        <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/New_OFFICIAL_LOGO.png"
+     alt=""
+     style="width:240px; max-width:80%; height:auto; display:block; border:none; margin:0 auto;">
+        <!-- Tactical action buttons -->
+        <div style="margin-top:20px; text-align:center;">
+          <button class="btn-tactical"
+                  onclick="window.location.href='/boot'"
+                  style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block; margin-bottom:10px;">
+            [ ENGAGE CHANNEL ]
+          </button><br>
+          <button class="btn-tactical btn-brief"
+                  onclick="window.location.href='/brief'"
+                  style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block;">
+            [ MISSION BRIEF ]
+          </button>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <!-- Bottom‑right scrolling terminal -->
+<div style="position:absolute; bottom:15px; right:15px; width:240px; max-width:80%; height:160px; overflow:hidden; background:#0a0c10; border:1px solid #2d3748; font-family:monospace; font-size:9px; line-height:1.3; color:#39ff14; z-index:5;">
   <div style="animation: scrollUp 25s linear infinite;">
-    <pre style="margin:0; padding:8px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
+    <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
 
 > INIT COMMS_PIPE --profile TACTICAL_NET
   [OK]  Handshake with NODE: FALCON-ALPHA
@@ -158,7 +177,7 @@ const renderLanding = (stats = {}) => {
 > PROMPT
 stratsignal:/tac_ops/comms $ █</pre>
     <!-- Duplicate for seamless loop -->
-    <pre style="margin:0; padding:8px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
+    <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
 
 > INIT COMMS_PIPE --profile TACTICAL_NET
   [OK]  Handshake with NODE: FALCON-ALPHA
@@ -217,25 +236,6 @@ stratsignal:/tac_ops/comms $ █</pre>
 stratsignal:/tac_ops/comms $ █</pre>
   </div>
 </div>
-        <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/New_OFFICIAL_LOGO.png"
-     alt=""
-     style="width:240px; max-width:80%; height:auto; display:block; border:none; margin:0 auto;">
-        <!-- Tactical action buttons -->
-        <div style="margin-top:20px; text-align:center;">
-          <button class="btn-tactical"
-                  onclick="window.location.href='/boot'"
-                  style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block; margin-bottom:10px;">
-            [ ENGAGE CHANNEL ]
-          </button><br>
-          <button class="btn-tactical btn-brief"
-                  onclick="window.location.href='/brief'"
-                  style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block;">
-            [ MISSION BRIEF ]
-          </button>
-        </div>
-      </td>
-    </tr>
-  </table>
 </body></html>`;
 };
 // ============ PHASE 2: LOGIN ============
