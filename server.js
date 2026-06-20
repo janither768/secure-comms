@@ -59,7 +59,7 @@ const renderLanding = (stats = {}) => {
   100% { transform: translateY(-50%); }
 }
 </style></head>
-<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat;">
+<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed;">
 
   <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
