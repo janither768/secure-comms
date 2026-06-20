@@ -333,115 +333,93 @@ const renderBrief = (id) => {
 <body style="background:#0a0c10; color:#a1b0c0;"><div style="padding:20px;">ERR: NO CHECKPOINTS</div></body></html>`;
   }
 
-  // ---- BUILD GRID (exact same code as before) ----
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (const p of points) {
-    minX = Math.min(minX, p.x);
-    maxX = Math.max(maxX, p.x);
-    minY = Math.min(minY, p.y);
-    maxY = Math.max(maxY, p.y);
-  }
+  // Pixels per grid cell (100m)
+  const CELL = 20;
+  const PADDING = 40;
 
-  const labels = points.map(p => {
-    const raw = p.name === 'HQ' ? 'HQ' : p.name.substring(0, 8);
-    return `[${raw}]`;
+  // Calculate pixel coordinates
+  const coords = points.map(p => ({ ...p, px: p.x * CELL, py: p.y * CELL }));
+
+  // Determine bounding box for viewBox
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  coords.forEach(({ px, py }) => {
+    minX = Math.min(minX, px);
+    minY = Math.min(minY, py);
+    maxX = Math.max(maxX, px);
+    maxY = Math.max(maxY, py);
   });
 
-  for (let i = 0; i < points.length; i++) {
-    const p = points[i];
-    const label = labels[i];
-    const labelStartX = p.x + 1;
-    const labelEndX = labelStartX + label.length - 1;
-    minX = Math.min(minX, labelStartX);
-    maxX = Math.max(maxX, labelEndX);
-    minY = Math.min(minY, p.y);
-    maxY = Math.max(maxY, p.y);
+  // Expand for labels and compass/scale
+  minX -= PADDING;
+  minY -= PADDING;
+  maxX += PADDING;
+  maxY += PADDING;
+  const vbWidth = maxX - minX;
+  const vbHeight = maxY - minY;
+
+  // Build SVG elements
+  let svgLines = '';
+  let svgMarkers = '';
+  let svgCheckpoints = '';
+  let svgLabels = '';
+
+  // Arrowhead marker definition
+  svgMarkers = `<defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#B85C00"/>
+    </marker>
+  </defs>`;
+
+  // Draw route segments
+  for (let i = 0; i < coords.length - 1; i++) {
+    const a = coords[i];
+    const b = coords[i+1];
+    svgLines += `<line x1="${a.px}" y1="${a.py}" x2="${b.px}" y2="${b.py}" stroke="#B85C00" stroke-width="2" marker-end="url(#arrow)"/>`;
   }
 
-  minX -= 2; maxX += 2;
-  minY -= 1; maxY += 1;
+  // Draw checkpoint circles and labels
+  coords.forEach((p, i) => {
+    const color = (p.name === 'HQ') ? '#39ff14' : '#B85C00';
+    svgCheckpoints += `<circle cx="${p.px}" cy="${p.py}" r="4" fill="${color}" stroke="#1f2937" stroke-width="1"/>`;
+    
+    // Label text offset to the right (10px)
+    const label = p.name === 'HQ' ? 'HQ' : p.name.substring(0, 8);
+    const lx = p.px + 8;
+    const ly = p.py + 4; // baseline offset
+    svgLabels += `<text x="${lx}" y="${ly}" fill="#a1b0c0" font-family="monospace" font-size="10">[${label}]</text>`;
+  });
 
-  const width = maxX - minX + 1;
-  const height = maxY - minY + 1;
+  // Compass Rose – placed at top-right of viewBox
+  const compassX = maxX - 30;
+  const compassY = minY + 30;
+  svgMarkers += `
+    <g transform="translate(${compassX},${compassY})">
+      <polygon points="0,-12 6,8 -6,8" fill="none" stroke="#39ff14" stroke-width="1"/>
+      <text x="0" y="15" fill="#39ff14" font-family="Michroma" font-size="8" text-anchor="middle">N</text>
+    </g>`;
 
-  const ox = -minX;
-  const oy = -minY;
+  // Scale Bar – placed at bottom-left of viewBox
+  const scaleX = minX + 20;
+  const scaleY = maxY - 15;
+  const barLength = CELL * 3; // 3 cells = 300m
+  svgMarkers += `
+    <g transform="translate(${scaleX},${scaleY})">
+      <line x1="0" y1="0" x2="${barLength}" y2="0" stroke="#5c748c" stroke-width="2"/>
+      <line x1="0" y1="-4" x2="0" y2="4" stroke="#5c748c"/>
+      <line x1="${barLength}" y1="-4" x2="${barLength}" y2="4" stroke="#5c748c"/>
+      <line x1="${barLength/2}" y1="-2" x2="${barLength/2}" y2="2" stroke="#5c748c"/>
+      <text x="${barLength/2}" y="12" fill="#5c748c" font-family="monospace" font-size="8" text-anchor="middle">300m</text>
+    </g>`;
 
-  const grid = Array(height).fill().map(() => Array(width).fill(' '));
+  // Build the full SVG
+  const svg = `<svg viewBox="${minX} ${minY} ${vbWidth} ${vbHeight}" width="100%" style="display:block; background:transparent;">
+    ${svgMarkers}
+    ${svgLines}
+    ${svgCheckpoints}
+    ${svgLabels}
+  </svg>`;
 
-  for (let i = 0; i < points.length - 1; i++) {
-    const a = points[i];
-    const b = points[i+1];
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const steps = Math.max(Math.abs(dx), Math.abs(dy));
-    if (steps === 0) continue;
-
-    const sx = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
-    const sy = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
-
-    let char = '─';
-    if (sx !== 0 && sy !== 0) {
-      char = (sx * sy === 1) ? '╲' : '╱';
-    } else if (sx !== 0) {
-      char = '─';
-    } else if (sy !== 0) {
-      char = '│';
-    }
-
-    for (let step = 1; step <= steps; step++) {
-      const cx = a.x + sx * step;
-      const cy = a.y + sy * step;
-      const gx = cx + ox;
-      const gy = cy + oy;
-      if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-        grid[gy][gx] = char;
-      }
-    }
-  }
-
-    // Place distance labels along legs
-  for (let i = 0; i < points.length - 1; i++) {
-    const a = points[i];
-    const b = points[i+1];
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const steps = Math.max(Math.abs(dx), Math.abs(dy));
-    if (steps === 0) continue;
-
-    // Calculate distance (meters) using SCALE
-    const distMeters = steps * SCALE;
-    const distLabel = (distMeters >= 1000) ? (distMeters/1000).toFixed(1) + 'k' : distMeters + 'm';
-
-    // Midpoint (rounded)
-    const midX = a.x + Math.round(dx / 2);
-    const midY = a.y + Math.round(dy / 2);
-
-    // Offset label to one side to avoid the line
-    // Determine perpendicular offset direction
-    let offsetX = 0, offsetY = 0;
-    if (dx === 0) { // vertical line, offset right
-      offsetX = 2;
-    } else if (dy === 0) { // horizontal line, offset down
-      offsetY = 1;
-    } else { // diagonal, offset right if slope positive, else left
-      offsetX = (dx * dy > 0) ? 2 : -2;
-    }
-
-    // Place label characters, ensuring within bounds
-    const labelStartX = midX + offsetX + ox;
-    const labelStartY = midY + offsetY + oy;
-    for (let c = 0; c < distLabel.length; c++) {
-      const col = labelStartX + c;
-      const row = labelStartY;
-      if (row >= 0 && row < height && col >= 0 && col < width) {
-        grid[row][col] = distLabel[c];
-      }
-    }
-  }
-
-  const mapText = grid.map(row => row.join('')).join('\n');
-
+  // Status and controls (unchanged)
   const statusColor = brief.status === 'ACTIVE' ? '#39ff14' : (brief.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
   let statusControls = '';
   if (brief.status === 'PLANNED') {
@@ -463,29 +441,10 @@ const renderBrief = (id) => {
     <div style="font-size:0.7em; color:${statusColor}; margin-top:4px;">STATUS: ${brief.status}</div>
   </div>
 
-    <!-- CSS-HARDENED MISSION MAP -->
+  <!-- SVG Mission Map (hardened container) -->
   <div style="overflow-x:auto; width:100%; margin:15px 0; padding:0;">
-    <!-- Map frame -->
     <div style="display:inline-block; background:#0a0c10; border:1px solid #2d3748; border-radius:2px; padding:10px; position:relative; min-width:100px;">
-      
-      <!-- Compass Rose (top-right) -->
-      <div style="position:absolute; top:12px; right:12px; text-align:center; z-index:2;">
-        <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:10px solid #39ff14; margin:0 auto;"></div>
-        <div style="color:#39ff14; font-family:'Michroma',sans-serif; font-size:8px; margin-top:1px;">N</div>
-      </div>
-
-      <!-- Scale Bar (bottom-left) -->
-      <div style="position:absolute; bottom:12px; left:12px; color:#5c748c; font-family:monospace; font-size:9px; z-index:2;">
-        <div style="width:40px; height:0; border-top:1px solid #5c748c; margin-bottom:2px; position:relative;">
-          <div style="position:absolute; left:0; top:-3px; width:1px; height:6px; background:#5c748c;"></div>
-          <div style="position:absolute; right:0; top:-3px; width:1px; height:6px; background:#5c748c;"></div>
-          <div style="position:absolute; left:50%; top:-2px; width:1px; height:4px; background:#5c748c;"></div>
-        </div>
-        <span>1 cell = ${SCALE}m</span>
-      </div>
-
-      <!-- The path itself (ASCII grid) -->
-      <pre style="margin:0; display:inline-block; white-space:pre; font-family:monospace; font-size:11px; line-height:1.2; color:#a1b0c0; background:transparent; border:none; padding:0;">${mapText}</pre>
+      ${svg}
     </div>
   </div>
 
