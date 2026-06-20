@@ -54,6 +54,10 @@ const renderLanding = (stats = {}) => {
     html, body { height: 100%; margin: 0; }
     /* Amber button override for brief */
     .btn-brief { background-color: #B85C00; }
+@keyframes scrollUp {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
 </style></head>
 <body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat;">
 
