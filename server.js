@@ -96,7 +96,7 @@ const renderLanding = (stats = {}) => {
       </td>
     </tr>
     <tr>
-      <td style="vertical-align:middle; text-align:center; padding:0;">
+      <td style="vertical-align:middle; text-align:center; padding:0; overflow-x:hidden;">
         <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/New_OFFICIAL_LOGO.png"
      alt=""
      style="width:240px; max-width:80%; height:auto; display:block; border:none; margin:0 auto;">
@@ -235,13 +235,19 @@ stratsignal:/tac_ops/comms $ █</pre>
                     </div>
         </div>
 
-        <!-- FIELD MANUAL v0.9200 (image behind text, no styling) -->
-        <div style="width:1366px; max-width:80%; margin:25px auto 0 auto; text-align:left; font-family:'Lato',sans-serif; color:#e0e0e0; font-size:12px; line-height:1.5; background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/The%20scrolling%20BG%20Trasnparent.png') center/cover no-repeat; padding:15px;">
-          <div style="color:#39ff14; font-family:'Michroma',sans-serif; font-size:10px; margin-bottom:8px;">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
-          <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
-          <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
-          <p style="margin:0 0 8px 0;">This is a mission kit, not a social app. You call in, you execute, you purge. No one is watching, and nothing remains after you leave – unless you choose to keep it.</p>
-          <p style="margin:0;">Stay sharp. StratSignal has your six.</p>
+                <!-- Full-width image backdrop behind field manual -->
+        <div style="position:relative; width:100vw; margin-left:calc(-50vw + 50%); margin-top:25px;">
+          <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/The%20scrolling%20BG%20Trasnparent.png" 
+               style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;" alt="">
+          
+          <!-- Manual text (centered, same width as logo, no background) -->
+          <div style="position:relative; z-index:1; width:240px; max-width:80%; margin:0 auto; text-align:left; font-family:'Lato',sans-serif; color:#e0e0e0; font-size:12px; line-height:1.5; padding:25px 15px;">
+            <div style="color:#39ff14; font-family:'Michroma',sans-serif; font-size:10px; margin-bottom:8px;">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
+            <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
+            <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
+            <p style="margin:0 0 8px 0;">This is a mission kit, not a social app. You call in, you execute, you purge. No one is watching, and nothing remains after you leave – unless you choose to keep it.</p>
+            <p style="margin:0;">Stay sharp. StratSignal has your six.</p>
+          </div>
         </div>
       </td>
     </tr>
