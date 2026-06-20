@@ -101,7 +101,7 @@ const renderLanding = (stats = {}) => {
      alt=""
      style="width:240px; max-width:80%; height:auto; display:block; border:none; margin:0 auto;">
         <!-- Tactical action buttons -->
-        <div style="margin-top:20px; text-align:center;">
+                <div style="margin-top:20px; text-align:center;">
           <button class="btn-tactical"
                   onclick="window.location.href='/boot'"
                   style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block; margin-bottom:10px;">
@@ -113,135 +113,136 @@ const renderLanding = (stats = {}) => {
             [ MISSION BRIEF ]
           </button>
         </div>
+
+        <!-- Terminal, same width as logo, transparent, no border -->
+        <div style="width:240px; max-width:80%; margin:25px auto 0 auto; height:160px; overflow:hidden; background:transparent; border:none; font-family:monospace; font-size:10px; line-height:1.3; color:#39ff14;">
+          <div style="animation: scrollUp 25s linear infinite;">
+            <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
+
+> INIT COMMS_PIPE --profile TACTICAL_NET
+  [OK]  Handshake with NODE: FALCON-ALPHA
+  [OK]  Uplink secured via SIGMA-TUNNEL
+  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
+  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
+
+> LOAD MISSION_PROFILE --id MS-2047-RAZOR
+  [OK]  Ruleset: ROE-BLACK
+  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
+  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
+
+> LINK_STATUS --verbose
+  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
+  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
+  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
+
+> ROUTE_SCAN --hops 6 --mask 0x7F
+  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
+  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
+  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
+  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
+  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
+
+> WATCH CHANNEL TAC-1 --filter=PRIORITY
+  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
+  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
+  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
+
+> TELEMETRY --unit=EAGLE-2
+  POS: 42D-17-09  |  ALT: 231 m
+  VEL: 3.2 m/s    |  HEADING: 087°
+  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
+
+> SIGNAL_ANALYTICS --window=30s
+  THROUGHPUT: 4.7 Mbps
+  NOISE_FLOOR: -87 dBm
+  INTERFERENCE: LOW
+  JAMMING: NOT DETECTED
+  CONFIDENCE: 98.1%
+
+> OPS_FEED --mode=SCROLL
+  [SYS]  New SITREP uploaded: SRP-26-ALPHA
+  [SYS]  Map layer updated: ISR-DRONE-DELTA
+  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
+  [SYS]  Auto-archive of low-priority traffic enabled
+
+> EXEC MACRO "BATTLE-COMMS"
+  STEP 1: SYNC CLOCKS .......... [OK]
+  STEP 2: VERIFY CALLSIGNS ..... [OK]
+  STEP 3: PUSH FREQ TABLES ..... [OK]
+  STEP 4: ARM FAILOVER LINK .... [OK]
+  RESULT: TACTICAL NET READY
+
+> PROMPT
+stratsignal:/tac_ops/comms $ █</pre>
+            <!-- Duplicate for seamless loop -->
+            <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
+
+> INIT COMMS_PIPE --profile TACTICAL_NET
+  [OK]  Handshake with NODE: FALCON-ALPHA
+  [OK]  Uplink secured via SIGMA-TUNNEL
+  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
+  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
+
+> LOAD MISSION_PROFILE --id MS-2047-RAZOR
+  [OK]  Ruleset: ROE-BLACK
+  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
+  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
+
+> LINK_STATUS --verbose
+  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
+  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
+  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
+
+> ROUTE_SCAN --hops 6 --mask 0x7F
+  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
+  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
+  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
+  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
+  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
+
+> WATCH CHANNEL TAC-1 --filter=PRIORITY
+  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
+  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
+  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
+
+> TELEMETRY --unit=EAGLE-2
+  POS: 42D-17-09  |  ALT: 231 m
+  VEL: 3.2 m/s    |  HEADING: 087°
+  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
+
+> SIGNAL_ANALYTICS --window=30s
+  THROUGHPUT: 4.7 Mbps
+  NOISE_FLOOR: -87 dBm
+  INTERFERENCE: LOW
+  JAMMING: NOT DETECTED
+  CONFIDENCE: 98.1%
+
+> OPS_FEED --mode=SCROLL
+  [SYS]  New SITREP uploaded: SRP-26-ALPHA
+  [SYS]  Map layer updated: ISR-DRONE-DELTA
+  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
+  [SYS]  Auto-archive of low-priority traffic enabled
+
+> EXEC MACRO "BATTLE-COMMS"
+  STEP 1: SYNC CLOCKS .......... [OK]
+  STEP 2: VERIFY CALLSIGNS ..... [OK]
+  STEP 3: PUSH FREQ TABLES ..... [OK]
+  STEP 4: ARM FAILOVER LINK .... [OK]
+  RESULT: TACTICAL NET READY
+
+> PROMPT
+stratsignal:/tac_ops/comms $ █</pre>
+          </div>
+        </div>
       </td>
     </tr>
   </table>
-  <!-- Bottom‑right scrolling terminal -->
-<div style="position:absolute; bottom:15px; right:15px; width:240px; max-width:80%; height:160px; overflow:hidden; background:#0a0c10; border:1px solid #2d3748; font-family:monospace; font-size:9px; line-height:1.3; color:#39ff14; z-index:5;">
-  <div style="animation: scrollUp 25s linear infinite;">
-    <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
-
-> INIT COMMS_PIPE --profile TACTICAL_NET
-  [OK]  Handshake with NODE: FALCON-ALPHA
-  [OK]  Uplink secured via SIGMA-TUNNEL
-  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
-  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
-
-> LOAD MISSION_PROFILE --id MS-2047-RAZOR
-  [OK]  Ruleset: ROE-BLACK
-  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
-  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
-
-> LINK_STATUS --verbose
-  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
-  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
-  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
-
-> ROUTE_SCAN --hops 6 --mask 0x7F
-  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
-  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
-  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
-  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
-  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
-
-> WATCH CHANNEL TAC-1 --filter=PRIORITY
-  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
-  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
-  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
-
-> TELEMETRY --unit=EAGLE-2
-  POS: 42D-17-09  |  ALT: 231 m
-  VEL: 3.2 m/s    |  HEADING: 087°
-  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
-
-> SIGNAL_ANALYTICS --window=30s
-  THROUGHPUT: 4.7 Mbps
-  NOISE_FLOOR: -87 dBm
-  INTERFERENCE: LOW
-  JAMMING: NOT DETECTED
-  CONFIDENCE: 98.1%
-
-> OPS_FEED --mode=SCROLL
-  [SYS]  New SITREP uploaded: SRP-26-ALPHA
-  [SYS]  Map layer updated: ISR-DRONE-DELTA
-  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
-  [SYS]  Auto-archive of low-priority traffic enabled
-
-> EXEC MACRO "BATTLE-COMMS"
-  STEP 1: SYNC CLOCKS .......... [OK]
-  STEP 2: VERIFY CALLSIGNS ..... [OK]
-  STEP 3: PUSH FREQ TABLES ..... [OK]
-  STEP 4: ARM FAILOVER LINK .... [OK]
-  RESULT: TACTICAL NET READY
-
-> PROMPT
-stratsignal:/tac_ops/comms $ █</pre>
-    <!-- Duplicate for seamless loop -->
-    <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
-
-> INIT COMMS_PIPE --profile TACTICAL_NET
-  [OK]  Handshake with NODE: FALCON-ALPHA
-  [OK]  Uplink secured via SIGMA-TUNNEL
-  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
-  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
-
-> LOAD MISSION_PROFILE --id MS-2047-RAZOR
-  [OK]  Ruleset: ROE-BLACK
-  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
-  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
-
-> LINK_STATUS --verbose
-  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
-  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
-  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
-
-> ROUTE_SCAN --hops 6 --mask 0x7F
-  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
-  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
-  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
-  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
-  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
-
-> WATCH CHANNEL TAC-1 --filter=PRIORITY
-  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
-  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
-  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
-
-> TELEMETRY --unit=EAGLE-2
-  POS: 42D-17-09  |  ALT: 231 m
-  VEL: 3.2 m/s    |  HEADING: 087°
-  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
-
-> SIGNAL_ANALYTICS --window=30s
-  THROUGHPUT: 4.7 Mbps
-  NOISE_FLOOR: -87 dBm
-  INTERFERENCE: LOW
-  JAMMING: NOT DETECTED
-  CONFIDENCE: 98.1%
-
-> OPS_FEED --mode=SCROLL
-  [SYS]  New SITREP uploaded: SRP-26-ALPHA
-  [SYS]  Map layer updated: ISR-DRONE-DELTA
-  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
-  [SYS]  Auto-archive of low-priority traffic enabled
-
-> EXEC MACRO "BATTLE-COMMS"
-  STEP 1: SYNC CLOCKS .......... [OK]
-  STEP 2: VERIFY CALLSIGNS ..... [OK]
-  STEP 3: PUSH FREQ TABLES ..... [OK]
-  STEP 4: ARM FAILOVER LINK .... [OK]
-  RESULT: TACTICAL NET READY
-
-> PROMPT
-stratsignal:/tac_ops/comms $ █</pre>
-  </div>
-</div>
 </body></html>`;
 };
 // ============ PHASE 2: LOGIN ============
 const renderLogin = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
-<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat; margin:0; height:100vh;">
+<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0; height:100vh;">
   <div style="display:table; width:100%; height:100%;">
     <div style="display:table-cell; vertical-align:middle; text-align:center;">
       <form method="POST" action="/login"
