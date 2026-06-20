@@ -232,7 +232,16 @@ stratsignal:/tac_ops/comms $ █</pre>
 
 > PROMPT
 stratsignal:/tac_ops/comms $ █</pre>
-          </div>
+                    </div>
+        </div>
+
+        <!-- FIELD MANUAL v0.9200 -->
+        <div style="width:240px; max-width:80%; margin:25px auto 0 auto; text-align:left; font-family:'Lato',sans-serif; color:#a1b0c0; font-size:12px; line-height:1.5;">
+          <div style="color:#39ff14; font-family:'Michroma',sans-serif; font-size:10px; margin-bottom:8px;">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
+          <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
+          <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
+          <p style="margin:0 0 8px 0;">This is a mission kit, not a social app. You call in, you execute, you purge. No one is watching, and nothing remains after you leave – unless you choose to keep it.</p>
+          <p style="margin:0;">Stay sharp. StratSignal has your six.</p>
         </div>
       </td>
     </tr>
