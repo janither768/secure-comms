@@ -400,15 +400,42 @@ const renderBrief = (id) => {
     }
   }
 
-  for (let i = 0; i < points.length; i++) {
-    const p = points[i];
-    const label = labels[i];
-    let lx = p.x + 1 + ox;
-    let ly = p.y + oy;
-    for (let c = 0; c < label.length; c++) {
-      const col = lx + c;
-      if (ly >= 0 && ly < height && col >= 0 && col < width) {
-        grid[ly][col] = label[c];
+    // Place distance labels along legs
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i];
+    const b = points[i+1];
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const steps = Math.max(Math.abs(dx), Math.abs(dy));
+    if (steps === 0) continue;
+
+    // Calculate distance (meters) using SCALE
+    const distMeters = steps * SCALE;
+    const distLabel = (distMeters >= 1000) ? (distMeters/1000).toFixed(1) + 'k' : distMeters + 'm';
+
+    // Midpoint (rounded)
+    const midX = a.x + Math.round(dx / 2);
+    const midY = a.y + Math.round(dy / 2);
+
+    // Offset label to one side to avoid the line
+    // Determine perpendicular offset direction
+    let offsetX = 0, offsetY = 0;
+    if (dx === 0) { // vertical line, offset right
+      offsetX = 2;
+    } else if (dy === 0) { // horizontal line, offset down
+      offsetY = 1;
+    } else { // diagonal, offset right if slope positive, else left
+      offsetX = (dx * dy > 0) ? 2 : -2;
+    }
+
+    // Place label characters, ensuring within bounds
+    const labelStartX = midX + offsetX + ox;
+    const labelStartY = midY + offsetY + oy;
+    for (let c = 0; c < distLabel.length; c++) {
+      const col = labelStartX + c;
+      const row = labelStartY;
+      if (row >= 0 && row < height && col >= 0 && col < width) {
+        grid[row][col] = distLabel[c];
       }
     }
   }
@@ -436,9 +463,30 @@ const renderBrief = (id) => {
     <div style="font-size:0.7em; color:${statusColor}; margin-top:4px;">STATUS: ${brief.status}</div>
   </div>
 
-  <!-- ASCII Grid Map (HTC‑safe scrolling wrapper) -->
+    <!-- CSS-HARDENED MISSION MAP -->
   <div style="overflow-x:auto; width:100%; margin:15px 0; padding:0;">
-    <pre style="margin:0; display:inline-block; white-space:pre; font-family:monospace; font-size:11px; line-height:1.2; color:#a1b0c0; background:#0a0c10; border:1px solid #1f2937; padding:10px;">${mapText}</pre>
+    <!-- Map frame -->
+    <div style="display:inline-block; background:#0a0c10; border:1px solid #2d3748; border-radius:2px; padding:10px; position:relative; min-width:100px;">
+      
+      <!-- Compass Rose (top-right) -->
+      <div style="position:absolute; top:12px; right:12px; text-align:center; z-index:2;">
+        <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:10px solid #39ff14; margin:0 auto;"></div>
+        <div style="color:#39ff14; font-family:'Michroma',sans-serif; font-size:8px; margin-top:1px;">N</div>
+      </div>
+
+      <!-- Scale Bar (bottom-left) -->
+      <div style="position:absolute; bottom:12px; left:12px; color:#5c748c; font-family:monospace; font-size:9px; z-index:2;">
+        <div style="width:40px; height:0; border-top:1px solid #5c748c; margin-bottom:2px; position:relative;">
+          <div style="position:absolute; left:0; top:-3px; width:1px; height:6px; background:#5c748c;"></div>
+          <div style="position:absolute; right:0; top:-3px; width:1px; height:6px; background:#5c748c;"></div>
+          <div style="position:absolute; left:50%; top:-2px; width:1px; height:4px; background:#5c748c;"></div>
+        </div>
+        <span>1 cell = ${SCALE}m</span>
+      </div>
+
+      <!-- The path itself (ASCII grid) -->
+      <pre style="margin:0; display:inline-block; white-space:pre; font-family:monospace; font-size:11px; line-height:1.2; color:#a1b0c0; background:transparent; border:none; padding:0;">${mapText}</pre>
+    </div>
   </div>
 
   <!-- Bottom controls -->
