@@ -235,8 +235,8 @@ stratsignal:/tac_ops/comms $ █</pre>
                     </div>
         </div>
 
-        <!-- FIELD MANUAL v0.9200 -->
-        <div style="width:240px; max-width:80%; margin:25px auto 0 auto; text-align:left; font-family:'Lato',sans-serif; color:#a1b0c0; font-size:12px; line-height:1.5;">
+                <!-- FIELD MANUAL v0.9200 (with scrollable image backdrop) -->
+        <div style="width:240px; max-width:80%; margin:25px auto 0 auto; text-align:left; font-family:'Lato',sans-serif; color:#e0e0e0; font-size:12px; line-height:1.5; background: linear-gradient(rgba(6,5,5,0.7), rgba(6,5,5,0.75)), url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/The%20scrolling%20BG%20Trasnparent.png') center/cover no-repeat; border:1px solid #2d3748; border-radius:4px; padding:15px;">
           <div style="color:#39ff14; font-family:'Michroma',sans-serif; font-size:10px; margin-bottom:8px;">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
           <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
           <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
