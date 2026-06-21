@@ -59,8 +59,9 @@ const renderLanding = (stats = {}) => {
   100% { transform: translateY(-50%); }
 }
 </style></head>
-<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed;">
-
+<body style="margin:0; background-color:#060505;">
+    <!-- Fixed background layer (always stays put) -->
+  <div style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat;"></div>
   <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
       <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
