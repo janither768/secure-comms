@@ -60,9 +60,10 @@ const renderLanding = (stats = {}) => {
 }
 </style></head>
 <body style="margin:0; background-color:#060505;">
-    <!-- Fixed background layer (always stays put) -->
-  <div style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat;"></div>
-  <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
+      <!-- Fixed background image (no scale jitter) -->
+  <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png" 
+       style="position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:-1;" alt="">
+    <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
     <tr>
       <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
         <div style="background:rgba(6,5,5,0.5); display:inline-block; padding:8px 12px; border-radius:0px; border:0px solid #1f2937;">
