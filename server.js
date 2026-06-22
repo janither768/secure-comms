@@ -279,6 +279,8 @@ const renderLanding = (stats = {}) => {
 (function() {
   var terminal = document.getElementById('terminal');
   if (!terminal) return;
+
+  // Clear initial HTML placeholder
   terminal.innerHTML = '';
 
   var lines = [
@@ -305,7 +307,7 @@ const renderLanding = (stats = {}) => {
     "  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]",
     "  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]",
     "  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]",
-    "  PATH_INTEGRITY: 96.3%  | ANOMALIES: 1",
+    "  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1",
     "",
     "> WATCH CHANNEL TAC-1 --filter=PRIORITY",
     "  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17",
@@ -313,8 +315,8 @@ const renderLanding = (stats = {}) => {
     "  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3",
     "",
     "> TELEMETRY --unit=EAGLE-2",
-    "  POS: 42D-17-09  | ALT: 231 m",
-    "  VEL: 3.2 m/s    | HEADING: 087 deg",
+    "  POS: 42D-17-09  |  ALT: 231 m",
+    "  VEL: 3.2 m/s    |  HEADING: 087 deg",
     "  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%",
     "",
     "> SIGNAL_ANALYTICS --window=30s",
@@ -330,7 +332,7 @@ const renderLanding = (stats = {}) => {
     "  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED",
     "  [SYS]  Auto-archive of low-priority traffic enabled",
     "",
-    "> EXEC MACRO \"BATTLE-COMMS\"",
+    "> EXEC MACRO \\\"BATTLE-COMMS\\\"",
     "  STEP 1: SYNC CLOCKS .......... [OK]",
     "  STEP 2: VERIFY CALLSIGNS ..... [OK]",
     "  STEP 3: PUSH FREQ TABLES ..... [OK]",
@@ -341,7 +343,11 @@ const renderLanding = (stats = {}) => {
     "stratsignal:/tac_ops/comms $ " + String.fromCharCode(9608)
   ];
 
-  var i = 0, c = 0, speed = 15, currentLineDiv = null;
+  var i = 0; 
+  var c = 0; 
+  var speed = 15; 
+  var currentLineDiv = null;
+
   var cursor = document.createElement('span');
   cursor.className = 'cursor';
   cursor.id = 'cursor';
@@ -353,10 +359,14 @@ const renderLanding = (stats = {}) => {
       if (c === 0) {
         currentLineDiv = document.createElement('div');
         terminal.insertBefore(currentLineDiv, cursor);
+
+        // Performance Guard: If terminal has over 50 lines, prune the oldest line
+        // (Account for the cursor element by checking if length > 51)
         if (terminal.childNodes.length > 51) {
           terminal.removeChild(terminal.firstChild);
         }
       }
+      
       if (c < lines[i].length) {
         currentLineDiv.textContent += lines[i].charAt(c);
         c++;
@@ -368,16 +378,21 @@ const renderLanding = (stats = {}) => {
         setTimeout(printNext, speed * 6);
       }
     } else {
+      // Infinite Loop Trigger: Instead of clearing, print a separator row, 
+      // pause for 2 seconds, reset indices, and continue appending logs.
       var separator = document.createElement('div');
-      separator.style.color = '#1f2937';
+      separator.style.color = '#1f2937'; // Dark subtle color for the break line
       separator.textContent = "--------------------------------------------------";
       terminal.insertBefore(separator, cursor);
+
       setTimeout(function() {
-        i = 0; c = 0;
+        i = 0;
+        c = 0;
         printNext();
       }, 2000);
     }
   }
+
   printNext();
 })();
 </script>
