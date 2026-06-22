@@ -880,141 +880,175 @@ const renderBriefForm = () => `<!DOCTYPE html>
 </body></html>`;
 // ============ PHASE 3: IN-BRIEF ROUTE PATH ============
 const renderBrief = (id) => {
-  const brief = briefs[id];
-  if (!brief) {
-    return `<!DOCTYPE html><html><head>${metaViewport}<style>${commonStyle}</style></head>
-<body style="background:#0a0c10; color:#a1b0c0;"><div style="padding:20px;">ERR: BRIEF NOT FOUND</div></body></html>`;
-  }
+  const mission = briefs[id];
+  if (!mission) return '<div style="color:#ff4c4c; padding:20px; font-family:monospace;">ERR: BRIEF DATA NOT FOUND</div>';
 
-  const points = brief.points;
-  if (!points || points.length === 0) {
-    return `<!DOCTYPE html><html><head>${metaViewport}<style>${commonStyle}</style></head>
-<body style="background:#0a0c10; color:#a1b0c0;"><div style="padding:20px;">ERR: NO CHECKPOINTS</div></body></html>`;
-  }
-
-  // Pixels per grid cell (100m)
-  const CELL = 20;
-  const PADDING = 40;
-
-  // Calculate pixel coordinates
-  const coords = points.map(p => ({ ...p, px: p.x * CELL, py: p.y * CELL }));
-
-  // Determine bounding box for viewBox
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  coords.forEach(({ px, py }) => {
-    minX = Math.min(minX, px);
-    minY = Math.min(minY, py);
-    maxX = Math.max(maxX, px);
-    maxY = Math.max(maxY, py);
+  const points = mission.points || [];
+  
+  // 1. Calculate Core Coordinate Boundaries
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  points.forEach(p => {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
   });
 
-  // Expand for labels and compass/scale
-  minX -= PADDING;
-  minY -= PADDING;
-  maxX += PADDING;
-  maxY += PADDING;
-  const vbWidth = maxX - minX;
-  const vbHeight = maxY - minY;
+  // Handle baseline fallback if array is empty
+  if (minX === Infinity) { minX = -2; maxX = 2; minY = -2; maxY = 2; }
 
-  // Build SVG elements
-  let svgLines = '';
-  let svgMarkers = '';
-  let svgCheckpoints = '';
-  let svgLabels = '';
+  // Add tactical buffer padding around the edges of the path
+  const paddingUnits = 2; 
+  const viewMinX = minX - paddingUnits;
+  const viewMaxX = maxX + paddingUnits;
+  const viewMinY = minY - paddingUnits;
+  const viewMaxY = maxY + paddingUnits;
 
-  // Arrowhead marker definition
-  svgMarkers = `<defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#B85C00"/>
-    </marker>
-  </defs>`;
+  const totalUnitsX = viewMaxX - viewMinX;
+  const totalUnitsY = viewMaxY - viewMinY;
 
-  // Draw route segments
-  for (let i = 0; i < coords.length - 1; i++) {
-    const a = coords[i];
-    const b = coords[i+1];
-    svgLines += `<line x1="${a.px}" y1="${a.py}" x2="${b.px}" y2="${b.py}" stroke="#B85C00" stroke-width="2" marker-end="url(#arrow)"/>`;
-  }
+  // 2. Fix the Scale Defect: Define absolute pixel density per unit (e.g., 75px per grid unit)
+  const PIXELS_PER_UNIT = 75;
+  
+  // Mathematically derive the exact canvas sizing requirements
+  const svgWidth = totalUnitsX * PIXELS_PER_UNIT;
+  const svgHeight = totalUnitsY * PIXELS_PER_UNIT;
 
-  // Draw checkpoint circles and labels
-  coords.forEach((p, i) => {
-    const color = (p.name === 'HQ') ? '#39ff14' : '#B85C00';
-    svgCheckpoints += `<circle cx="${p.px}" cy="${p.py}" r="4" fill="${color}" stroke="#1f2937" stroke-width="1"/>`;
-    
-    // Label text offset to the right (10px)
-    const label = p.name === 'HQ' ? 'HQ' : p.name.substring(0, 8);
-    const lx = p.px + 8;
-    const ly = p.py + 4; // baseline offset
-    svgLabels += `<text x="${lx}" y="${ly}" fill="#a1b0c0" font-family="monospace" font-size="10">[${label}]</text>`;
+  // 3. Generate SVG Internal Elements (Grid lines, Path tracking, Checkpoints)
+  // Build a repeating background grid pattern that scales natively inside Firefox 47
+  const gridPatternSize = PIXELS_PER_UNIT;
+  
+  let pathD = '';
+  let markersHtml = '';
+  
+  points.forEach((p, i) => {
+    // Construct sequential SVG path lines
+    if (i === 0) {
+      pathD += `M ${p.x} ${p.y}`;
+    } else {
+      pathD += ` L ${p.x} ${p.y}`;
+    }
+
+    // Interactive targeting reticles for each checkpoint position
+    markersHtml += `
+      <g class="tgt-node">
+        <circle cx="${p.x}" cy="${p.y}" r="0.12" fill="#060505" stroke="#39ff14" stroke-width="0.04" />
+        <line x1="${p.x - 0.2}" y1="${p.y}" x2="${p.x + 0.2}" y2="${p.y}" stroke="#39ff14" stroke-width="0.015" />
+        <line x1="${p.x}" y1="${p.y - 0.2}" x2="${p.x}" y2="${p.y + 0.2}" stroke="#39ff14" stroke-width="0.015" />
+        <text x="${p.x + 0.2}" y="${p.y + 0.1}" fill="#39ff14" font-family:monospace; font-size="0.25" font-weight="bold" style="letter-spacing:0px;">
+          WP_${i}: ${escapeHtml(p.name)}
+        </text>
+      </g>
+    `;
   });
-
-  // Compass Rose – placed at top-right of viewBox
-  const compassX = maxX - 30;
-  const compassY = minY + 30;
-  svgMarkers += `
-    <g transform="translate(${compassX},${compassY})">
-      <polygon points="0,-12 6,8 -6,8" fill="none" stroke="#39ff14" stroke-width="1"/>
-      <text x="0" y="15" fill="#39ff14" font-family="Michroma" font-size="8" text-anchor="middle">N</text>
-    </g>`;
-
-  // Scale Bar – placed at bottom-left of viewBox
-  const scaleX = minX + 20;
-  const scaleY = maxY - 15;
-  const barLength = CELL * 3; // 3 cells = 300m
-  svgMarkers += `
-    <g transform="translate(${scaleX},${scaleY})">
-      <line x1="0" y1="0" x2="${barLength}" y2="0" stroke="#5c748c" stroke-width="2"/>
-      <line x1="0" y1="-4" x2="0" y2="4" stroke="#5c748c"/>
-      <line x1="${barLength}" y1="-4" x2="${barLength}" y2="4" stroke="#5c748c"/>
-      <line x1="${barLength/2}" y1="-2" x2="${barLength/2}" y2="2" stroke="#5c748c"/>
-      <text x="${barLength/2}" y="12" fill="#5c748c" font-family="monospace" font-size="8" text-anchor="middle">300m</text>
-    </g>`;
-
-  // Build the full SVG
-  const svg = `<svg viewBox="${minX} ${minY} ${vbWidth} ${vbHeight}" width="100%" style="display:block; background:transparent;">
-    ${svgMarkers}
-    ${svgLines}
-    ${svgCheckpoints}
-    ${svgLabels}
-  </svg>`;
-
-  // Status and controls (unchanged)
-  const statusColor = brief.status === 'ACTIVE' ? '#39ff14' : (brief.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
-  let statusControls = '';
-  if (brief.status === 'PLANNED') {
-    statusControls = ` | <a href="/brief/status/${id}/ACTIVE" style="color:#39ff14; text-decoration:none; font-size:0.7em;">[ ACTIVE ]</a>`;
-  } else if (brief.status === 'ACTIVE') {
-    statusControls = ` | <a href="/brief/status/${id}/COMPLETE" style="color:#5c748c; text-decoration:none; font-size:0.7em;">[ COMPLETE ]</a>`;
-  }
 
   return `<!DOCTYPE html>
-<html><head>${metaViewport}${fontImport}<style>
+<html>
+<head>
+  ${metaViewport}
+  ${fontImport}
+  <style>
     ${commonStyle}
-    html, body { height: 100%; margin: 0; }
-</style></head>
-<body style="background:#0a0c10; padding-bottom:80px; margin:0;">
+    html, body { background-color: #060505; color: #a1b0c0; padding: 10px; margin:0; font-family: monospace; }
+    
+    /* Dynamic Plotting Container - Isolates map scrollbars from the main app interface */
+    .plotting-bay {
+      width: 100%;
+      overflow: auto; /* Activates pure panning behavior on legacy touch screens */
+      border: 1px solid #2d3748;
+      background-color: #090b0e;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      -webkit-overflow-scrolling: touch; /* Butter-smooth scrolling override for old mobile devices */
+    }
 
-  <!-- Header -->
-  <div style="background:#11151c; border-bottom:1px solid #1f2937; padding:15px; margin:0;">
-    <div style="font-size:1em; color:#fff; font-weight:bold;">${escapeHtml(brief.missionName)}</div>
-    <div style="font-size:0.7em; color:${statusColor}; margin-top:4px;">STATUS: ${brief.status}</div>
-  </div>
+    /* Fixed Layout adjustments for Firefox 47 (No Grid or Flex Gap dependencies) */
+    .brief-meta-box {
+      background: rgba(11, 13, 17, 0.9);
+      border: 1px solid #2d3748;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .btn-action-group { margin-top: 10px; }
+    .btn-action {
+      display: inline-block;
+      padding: 10px 15px;
+      background: #5D3FD3;
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 10px;
+      margin-bottom: 5px;
+      border: 1px solid #6e52e6;
+    }
+    .btn-action.status-trigger { background: #39ff14; color: #000; border-color: #50ff30; }
+  </style>
+</head>
+<body>
 
-  <!-- SVG Mission Map (hardened container) -->
-  <div style="overflow-x:auto; width:100%; margin:15px 0; padding:0;">
-    <div style="display:inline-block; background:#0a0c10; border:1px solid #2d3748; border-radius:2px; padding:10px; position:relative; min-width:100px;">
-      ${svg}
+  <a href="/" class="btn-back">◄ HUB INDEX</a>
+
+  <div class="brief-meta-box">
+    <div style="color: #5c748c; font-size: 0.8em; margin-bottom: 5px;">// STRATEGIC_MISSION_BRIEF</div>
+    <h2 style="margin: 0 0 10px 0; font-family: 'Michroma', sans-serif; color: #fff; font-size: 1.2em;">
+      ${escapeHtml(mission.missionName)}
+    </h2>
+    <div style="font-size: 0.9em;">
+      STATUS: <span style="color:#39ff14; font-weight:bold;">[${mission.status}]</span> | 
+      ESTIMATED SECTOR COVERAGE: ${(totalUnitsX * 100)}m x ${(totalUnitsY * 100)}m
+    </div>
+    
+    <div class="btn-action-group">
+      <a href="/brief/status/${id}/ACTIVE" class="btn-action status-trigger">DEPLOY // GO LIVE</a>
+      <a href="/brief/status/${id}/COMPLETE" class="btn-action" style="background:#5c748c; border-color:#718096;">ARCHIVE BRIEF</a>
     </div>
   </div>
 
-  <!-- Bottom controls -->
-  <div style="position:fixed; bottom:0; left:0; right:0; background:#11151c; border-top:1px solid #2d3748; 
-              padding:10px; text-align:center; z-index:100; box-sizing:border-box; font-size:0.7em;">
-    <a href="/brief" style="color:#5c748c; text-decoration:none;">[ NEW BRIEF ]</a>${statusControls}
-    <span style="color:#2d3748; margin:0 5px;">|</span>
-    <a href="/brief/kill/${id}" style="color:#ff4c4c; text-decoration:none; font-weight:bold;">[ KILL ]</a>
+  <div class="plotting-bay">
+    <svg 
+      width="${svgWidth}px" 
+      height="${svgHeight}px" 
+      viewBox="${viewMinX} ${viewMinY} ${totalUnitsX} ${totalUnitsY}" 
+      xmlns="http://www.w3.org/2000/svg"
+      style="display: block; background-color: #060505;"
+    >
+      <defs>
+        <pattern id="tactical-grid" width="1" height="1" patternUnits="userSpaceOnUse">
+          <rect width="1" height="1" fill="none" stroke="#1c2330" stroke-width="0.02" />
+          <circle cx="0" cy="0" r="0.03" fill="#2d3748" />
+        </pattern>
+      </defs>
+
+      <rect x="${viewMinX}" y="${viewMinY}" width="${totalUnitsX}" height="${totalUnitsY}" fill="url(#tactical-grid)" />
+
+      <path d="${pathD}" fill="none" stroke="#39ff14" stroke-width="0.04" stroke-dasharray="0.1,0.05" stroke-linejoin="round" stroke-linecap="round" />
+
+      ${markersHtml}
+
+      <g transform="translate(${viewMaxX - 0.8}, ${viewMinY + 0.8})">
+        <circle cx="0" cy="0" r="0.4" fill="rgba(6,5,5,0.8)" stroke="#5c748c" stroke-width="0.02" />
+        <line x1="0" y1="-0.35" x2="0" y2="0.35" stroke="#5c748c" stroke-width="0.02" />
+        <line x1="-0.35" y1="0" x2="0.35" y2="0" stroke="#5c748c" stroke-width="0.02" />
+        <polygon points="0,-0.38 -0.08,-0.1 0,-0.18 0.08,-0.1" fill="#ff4c4c" />
+        <text x="-0.07" y="-0.45" fill="#5c748c" font-size="0.18" font-family="monospace" font-weight="bold">N</text>
+      </g>
+
+      <g transform="translate(${viewMinX + 0.5}, ${viewMaxY - 0.5})">
+        <rect x="0" y="0" width="1" height="0.08" fill="#39ff14" />
+        <line x1="0" y1="-0.05" x2="0" y2="0.13" stroke="#39ff14" stroke-width="0.03" />
+        <line x1="1" y1="-0.05" x2="1" y2="0.13" stroke="#39ff14" stroke-width="0.03" />
+        <text x="0" y="-0.15" fill="#a1b0c0" font-size="0.2" font-family="monospace">100m (S_SCALE)</text>
+      </g>
+    </svg>
   </div>
-</body></html>`;
+
+  <div style="color: #5c748c; font-size: 0.8em; text-align: center;">
+    // USE TOUCH SWIPE OR MOUSE DRAG INSIDE PLOTTING BAY TO NAVIGATE CHASSIS MAPPING Array
+  </div>
+
+</body>
+</html>`;
 };
 // ============ PHASE 3: IN-CHANNEL (CHAT WITH TIMESTAMPS) ============
 const renderChat = (user, room) => {
