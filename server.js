@@ -670,7 +670,7 @@ const renderMissionDashboard = (id, user, isCreator) => {
     // Append localized role descriptors safely
     const isOpCreator = cleanCallsign.toLowerCase() === creator.toLowerCase();
     const isSelf = cleanCallsign.toLowerCase() === user.toLowerCase();
-    const roleTag = isOpCreator ? '<span class="op-role">[HQ_NEXUS]</span>' : (isSelf ? '<span class="op-role" style="color:#39ff14;">[YOU]</span>' : '');
+    const roleTag = isOpCreator ? '<span class="op-role">[COMMANDER]</span>' : (isSelf ? '<span class="op-role" style="color:#39ff14;">[YOU]</span>' : '');
 
     return `
       <div class="roster-card" style="border-left: 4px solid ${statusColor};">
@@ -755,18 +755,21 @@ const renderMissionDashboard = (id, user, isCreator) => {
     }
     .btn-dash.map { background: #5D3FD3; color: white; border-color: #6e52e6; }
     .btn-dash.chat { background: #39ff14; color: black; border-color: #50ff30; }
-    .btn-dash.kill { 
-      background: #5c748c; /* Matte tactical slate gray */
-      color: #ffffff; /* White text */
+    .btn-dash.btn-kill { 
+      background: #5c748c !important; /* Forces slate gray over browser link defaults */
+      color: #ffffff !important; /* Forces white text over browser link defaults */
       border-color: #718096; 
       grid-column: span 2; 
       margin-top: 5px; 
       cursor: pointer;
+      display: block; /* Guarantees layout rendering on older engines */
     }
+    
     /* Changes to warning-red instantly when clicked or tapped */
-    .btn-dash.kill:active { 
+    .btn-dash.btn-kill:active { 
       background: #ff4c4c !important; 
-      border-color: #ff6b6b !important; 
+      border-color: #ff6b6b !important;
+      color: #ffffff !important;
     }
 
     .roster-container { display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; }
@@ -805,7 +808,7 @@ const renderMissionDashboard = (id, user, isCreator) => {
           <div class="telemetry-table">
             <div class="telemetry-row"><span class="lbl">MISSION ID</span><span class="val">#${id}</span></div>
             <div class="telemetry-row"><span class="lbl">CHANNEL CODE</span><span class="val" style="color:#39ff14;">${escapeHtml(mission.room)}</span></div>
-            <div class="telemetry-row"><span class="lbl">NEXUS CREATOR</span><span class="val">${escapeHtml(creator)}</span></div>
+            <div class="telemetry-row"><span class="lbl">OPERATION CREATOR</span><span class="val">${escapeHtml(creator)}</span></div>
             <div class="telemetry-row"><span class="lbl">YOUR CALLSIGN</span><span class="val" style="color:#5D3FD3; font-weight:bold;">${escapeHtml(user)}</span></div>
             <div class="telemetry-row"><span class="lbl">NET CYCLE</span><span class="val" style="color:#5c748c;">EPHEMERAL ARRAY</span></div>
           </div>
@@ -819,7 +822,7 @@ const renderMissionDashboard = (id, user, isCreator) => {
       </div>
 
       <div class="panel panel-side">
-        <div class="panel-title">// ACTIVE_OPERATIONAL_ROSTER</div>
+        <div class="panel-title">// ACTIVE_OPERATOR_ROSTER</div>
         <div class="roster-container">
           ${rosterHtml}
         </div>
