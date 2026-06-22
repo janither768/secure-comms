@@ -279,7 +279,7 @@ const renderLanding = (stats = {}) => {
   var terminal = document.getElementById('terminal');
   if (!terminal) return;
 
-  // remove the placeholder cursor span – we'll recreate it
+  // Clear any existing content inside the terminal box
   terminal.innerHTML = '';
 
   var lines = [
@@ -331,7 +331,7 @@ const renderLanding = (stats = {}) => {
     "  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED",
     "  [SYS]  Auto-archive of low-priority traffic enabled",
     "",
-    "> EXEC MACRO \"BATTLE-COMMS\"",
+    "> EXEC MACRO \\\"BATTLE-COMMS\\\"",
     "  STEP 1: SYNC CLOCKS .......... [OK]",
     "  STEP 2: VERIFY CALLSIGNS ..... [OK]",
     "  STEP 3: PUSH FREQ TABLES ..... [OK]",
@@ -342,32 +342,44 @@ const renderLanding = (stats = {}) => {
     "stratsignal:/tac_ops/comms $ " + String.fromCharCode(9608)
   ];
 
-  var i = 0;
-  var speed = 20;
+  var i = 0; // Current line index
+  var c = 0; // Current character index
+  var speed = 15; // Delay between characters in milliseconds
+  var currentLineDiv = null;
 
   // Create a blinking cursor element and keep it always at the end
   var cursor = document.createElement('span');
   cursor.className = 'cursor';
   cursor.id = 'cursor';
-  // give it a tiny space to hold the shape
   cursor.innerHTML = '&nbsp;';
+  terminal.appendChild(cursor);
 
   function printNext() {
     if (i < lines.length) {
-      // create a line container (text node would work too, but a div is easier)
-      var lineDiv = document.createElement('div');
-      lineDiv.textContent = lines[i];
-      terminal.appendChild(lineDiv);
-      // move cursor to the very end
-      terminal.appendChild(cursor);
-      terminal.scrollTop = terminal.scrollHeight;
-      i++;
-      setTimeout(printNext, speed);
+      // If we are starting a new line, create its container element
+      if (c === 0) {
+        currentLineDiv = document.createElement('div');
+        // Insert the line right before the cursor
+        terminal.insertBefore(currentLineDiv, cursor);
+      }
+      
+      // Type out the line character by character
+      if (c < lines[i].length) {
+        currentLineDiv.textContent += lines[i].charAt(c);
+        c++;
+        terminal.scrollTop = terminal.scrollHeight; // Auto-scrolls container down
+        setTimeout(printNext, speed);
+      } else {
+        // Current line completed: reset character count, move to next line index
+        i++;
+        c = 0;
+        // Pause briefly after completing a full line before printing the next one
+        setTimeout(printNext, speed * 6);
+      }
     }
   }
 
-  // Start with cursor already visible
-  terminal.appendChild(cursor);
+  // Kickstart the typing sequence
   printNext();
 })();
 </script>
