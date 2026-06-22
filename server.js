@@ -755,7 +755,8 @@ const renderMissionDashboard = (id, user, isCreator) => {
     }
     .btn-dash.map { background: #5D3FD3; color: white; border-color: #6e52e6; }
     .btn-dash.chat { background: #39ff14; color: black; border-color: #50ff30; }
-    .btn-dash.kill { background: #ff4c4c; color: white; border-color: #ff6b6b; grid-column: span 2; margin-top: 5px; }
+    .btn-dash.kill { background: #2d3748; color: white; border-color: #4a5b6b; grid-column: span 2; margin-top: 5px; }
+    .btn-dash.kill:active { background: #ff4c4c; border-color: #ff6b6b; }
 
     .roster-container { display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; }
     .roster-card {
