@@ -42,8 +42,21 @@ const commonStyle = `
   .btn-tactical { background-color: #5D3FD3; color: white; border: none; padding: 12px 24px; cursor: pointer; font-family: 'Michroma', sans-serif; text-transform: uppercase; font-weight: bold; }
   .status-matrix { color: #5c748c; font-family: monospace; font-size: 0.75em; }
   input { font-size: 16px; }
+  .btn-back {
+    display: inline-block;
+    background: #2d3748;
+    color: #a1b0c0;
+    border: 1px solid #4a5b6b;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: 'Michroma', sans-serif;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.75em;
+    margin-bottom: 15px;
+  }
 `;
-
 // ============ PHASE 1: PRE-CHANNEL (LIVE STATUS OVERHAUL) ============
 const renderLanding = (stats = {}) => {
   const { totalOps = 0, activeChannels = 0, totalMessages = 0, uptimeStr = '--' } = stats;
@@ -463,6 +476,7 @@ const renderLogin = () => `<!DOCTYPE html>
 </style></head>
 <body>
   <div class="login-container">
+    <a href="/" class="btn-back">◄ BACK TO HUB</a>
     <div class="login-header">STRATSIGNAL</div>
     <div class="login-sub">AUTH TERMINAL // SECURE COMMS</div>
     <form method="POST" action="/login">
@@ -492,6 +506,7 @@ const renderMissionLanding = () => `<!DOCTYPE html>
 </style></head>
 <body>
   <div class="choice-box">
+    <a href="/" class="btn-back">◄ BACK TO HUB</a>
     <h2>MISSION MODE</h2>
     <a href="/mission/create" class="btn-choice">CREATE</a>
     <a href="/mission/join" class="btn-choice join">JOIN</a>
@@ -511,13 +526,15 @@ const renderNewMissionForm = () => `<!DOCTYPE html>
 </style></head>
 <body>
   <div class="form-container">
+    <a href="/mission" class="btn-back">◄ BACK</a>
     <h2 style="font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 20px; font-size:1em;">CREATE MISSION</h2>
     <form method="POST" action="/mission/create">
+    
       <label>MISSION NAME</label>
       <input type="text" name="missionName" required placeholder="OP NIGHTFALL">
 
       <label>CHECKPOINTS (one per line: NAME DIR DIST)</label>
-      <textarea name="checkpoints" rows="5" required placeholder="LZ Alpha NE 300&#10;Ridge Overwatch E 500&#10;Extract Point SE 200"></textarea>
+      <textarea name="checkpoints" rows="5" required placeholder="LZAlpha NE 300&#10;RidgeOverwatch E 500&#10;ExtractPoint SE 200"></textarea>
 
       <label>AUTHORISED CALLSIGNS (comma separated)</label>
       <input type="text" name="callsigns" required placeholder="EAGLE-2,GHOST-7,SPECTRE-4">
@@ -545,8 +562,10 @@ const renderJoinMissionForm = () => `<!DOCTYPE html>
 </style></head>
 <body>
   <div class="join-box">
+    <a href="/mission" class="btn-back">◄ BACK</a>
     <h2>JOIN MISSION</h2>
     <form method="POST" action="/mission/join">
+    
       <label>MISSION ID</label>
       <input type="text" name="missionId" required placeholder="1">
 
@@ -591,6 +610,8 @@ const renderMissionDashboard = (id, user, isCreator) => {
     <div class="info-row"><span class="label">Operators:</span> <span>${mission.authorizedCallsigns.join(', ')}</span></div>
     <div class="info-row"><span class="label">Status:</span> <span>${mission.status}</span></div>
     <div class="info-row"><span class="label">Calling in as:</span> <span>${escapeHtml(user)}</span></div>
+    <a href="/" class="btn-back">◄ BACK TO HUB</a>
+    <h2>${escapeHtml(mission.missionName)} <span style="font-size:0.7em; color:${statusColor};">[${mission.status}]</span></h2>
 
     <div class="actions">
       <a href="/brief/${id}" class="map">MAP BRIEF</a>
