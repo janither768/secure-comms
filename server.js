@@ -82,37 +82,38 @@ const renderLanding = (stats = {}) => {
   }
   .zulu-clock { color: #39ff14; }
 
-  /* Main content block – everything below the top bar */
+  /* Main content area */
   .main-content {
-    padding-top: 80px;        /* space for fixed top bar */
+    padding-top: 80px;
     width: 100%;
     box-sizing: border-box;
   }
 
-  /* The horizontal row for PC, vertical for mobile */
+  /* Horizontal row – desktop */
   .content-row {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;   /* pushes left/right, middle stays center */
     flex-wrap: wrap;
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 20px 10px;
-    gap: 30px;
+    padding: 20px 20px;
+    gap: 20px;
   }
 
-  /* Logo container */
+  /* Logo – bigger, left aligned */
   .logo-col {
-    flex: 0 1 auto;
-    text-align: center;
+    flex: 0 0 auto;
+    margin-right: auto;   /* pins it to the left */
   }
   .logo-col img {
-    max-width: 200px;
+    max-width: 280px;     /* bigger logo */
     height: auto;
+    display: block;
   }
 
-  /* Buttons column – stacked vertically */
+  /* Buttons – center column */
   .buttons-col {
     display: flex;
     flex-direction: column;
@@ -122,34 +123,44 @@ const renderLanding = (stats = {}) => {
   .btn-tactical {
     min-width: 200px;
     box-shadow: none;
+    padding: 12px 24px;
   }
   .btn-brief {
     background-color: #B85C00;
   }
 
-  /* Terminal column */
+  /* Terminal – right aligned */
   .terminal-col {
     flex: 1 1 300px;
     max-width: 500px;
-    height: 160px;
-    overflow: hidden;
+    height: 180px;
+    overflow-y: auto;        /* scroll down as text appears */
     background: rgba(0,0,0,0.3);
     border: 1px solid #2d3748;
     font-family: monospace;
     font-size: 10px;
     line-height: 1.3;
     color: #39ff14;
-  }
-  .terminal-scroll {
-    animation: scrollUp 25s linear infinite;
     padding: 10px;
+    margin-left: auto;       /* pins it to the right */
+    white-space: pre-wrap;
+    word-break: break-all;
   }
-  @keyframes scrollUp {
-    0%   { transform: translateY(0); }
-    100% { transform: translateY(-50%); }
+  /* Cursor blink */
+  .cursor {
+    display: inline-block;
+    width: 6px;
+    height: 12px;
+    background: #39ff14;
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+    margin-left: 2px;
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
   }
 
-  /* Manual section (always full width) */
+  /* Manual section unchanged */
   .manual-section {
     margin-top: 30px;
     padding: 30px 15px;
@@ -170,18 +181,23 @@ const renderLanding = (stats = {}) => {
     margin-bottom: 12px;
   }
 
-  /* Phone breakpoint: stack everything */
+  /* Phone stack */
   @media (max-width: 700px) {
     .content-row {
       flex-direction: column;
-      gap: 25px;
+      align-items: center;
+    }
+    .logo-col, .terminal-col {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
     }
     .terminal-col {
       width: 100%;
       max-width: 100%;
     }
     .logo-col img {
-      max-width: 150px;
+      max-width: 180px;
     }
   }
 </style></head>
@@ -202,7 +218,7 @@ const renderLanding = (stats = {}) => {
     </div>
   </div>
 
-  <!-- Main content area -->
+  <!-- Main content -->
   <div class="main-content">
     <div class="content-row">
       <!-- Logo left -->
@@ -221,130 +237,13 @@ const renderLanding = (stats = {}) => {
         </button>
       </div>
 
-      <!-- Terminal right -->
-      <div class="terminal-col">
-        <div class="terminal-scroll">
-          <!-- Exactly the same terminal text as before, duplicated for seamless loop -->
-          <pre style="margin:0; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
-
-> INIT COMMS_PIPE --profile TACTICAL_NET
-  [OK]  Handshake with NODE: FALCON-ALPHA
-  [OK]  Uplink secured via SIGMA-TUNNEL
-  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
-  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
-
-> LOAD MISSION_PROFILE --id MS-2047-RAZOR
-  [OK]  Ruleset: ROE-BLACK
-  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
-  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
-
-> LINK_STATUS --verbose
-  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
-  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
-  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
-
-> ROUTE_SCAN --hops 6 --mask 0x7F
-  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
-  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
-  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
-  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
-  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
-
-> WATCH CHANNEL TAC-1 --filter=PRIORITY
-  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
-  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
-  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
-
-> TELEMETRY --unit=EAGLE-2
-  POS: 42D-17-09  |  ALT: 231 m
-  VEL: 3.2 m/s    |  HEADING: 087°
-  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
-
-> SIGNAL_ANALYTICS --window=30s
-  THROUGHPUT: 4.7 Mbps
-  NOISE_FLOOR: -87 dBm
-  INTERFERENCE: LOW
-  JAMMING: NOT DETECTED
-  CONFIDENCE: 98.1%
-
-> OPS_FEED --mode=SCROLL
-  [SYS]  New SITREP uploaded: SRP-26-ALPHA
-  [SYS]  Map layer updated: ISR-DRONE-DELTA
-  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
-  [SYS]  Auto-archive of low-priority traffic enabled
-
-> EXEC MACRO "BATTLE-COMMS"
-  STEP 1: SYNC CLOCKS .......... [OK]
-  STEP 2: VERIFY CALLSIGNS ..... [OK]
-  STEP 3: PUSH FREQ TABLES ..... [OK]
-  STEP 4: ARM FAILOVER LINK .... [OK]
-  RESULT: TACTICAL NET READY
-
-> PROMPT
-stratsignal:/tac_ops/comms $ █</pre>
-            <!-- Duplicate for seamless loop -->
-            <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
-
-> INIT COMMS_PIPE --profile TACTICAL_NET
-  [OK]  Handshake with NODE: FALCON-ALPHA
-  [OK]  Uplink secured via SIGMA-TUNNEL
-  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
-  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
-
-> LOAD MISSION_PROFILE --id MS-2047-RAZOR
-  [OK]  Ruleset: ROE-BLACK
-  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
-  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
-
-> LINK_STATUS --verbose
-  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
-  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
-  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
-
-> ROUTE_SCAN --hops 6 --mask 0x7F
-  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
-  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
-  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
-  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
-  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
-
-> WATCH CHANNEL TAC-1 --filter=PRIORITY
-  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
-  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
-  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
-
-> TELEMETRY --unit=EAGLE-2
-  POS: 42D-17-09  |  ALT: 231 m
-  VEL: 3.2 m/s    |  HEADING: 087°
-  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
-
-> SIGNAL_ANALYTICS --window=30s
-  THROUGHPUT: 4.7 Mbps
-  NOISE_FLOOR: -87 dBm
-  INTERFERENCE: LOW
-  JAMMING: NOT DETECTED
-  CONFIDENCE: 98.1%
-
-> OPS_FEED --mode=SCROLL
-  [SYS]  New SITREP uploaded: SRP-26-ALPHA
-  [SYS]  Map layer updated: ISR-DRONE-DELTA
-  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
-  [SYS]  Auto-archive of low-priority traffic enabled
-
-> EXEC MACRO "BATTLE-COMMS"
-  STEP 1: SYNC CLOCKS .......... [OK]
-  STEP 2: VERIFY CALLSIGNS ..... [OK]
-  STEP 3: PUSH FREQ TABLES ..... [OK]
-  STEP 4: ARM FAILOVER LINK .... [OK]
-  RESULT: TACTICAL NET READY
-
-> PROMPT
-stratsignal:/tac_ops/comms $ █</pre>
-        </div>
+      <!-- Terminal right – line-by-line typewriter -->
+      <div class="terminal-col" id="terminal">
+        <span class="cursor" id="cursor"></span>
       </div>
     </div>
 
-    <!-- Field manual (below) -->
+    <!-- Field manual -->
     <div class="manual-section">
       <div class="manual-inner">
         <div class="manual-title">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
@@ -356,7 +255,7 @@ stratsignal:/tac_ops/comms $ █</pre>
     </div>
   </div>
 
-  <!-- ZULU clock script (unchanged) -->
+  <!-- ZULU clock script -->
   <script>
     (function() {
       var el = document.getElementById('zulu');
@@ -371,6 +270,96 @@ stratsignal:/tac_ops/comms $ █</pre>
       }
       tick();
       setInterval(tick, 1000);
+    })();
+  </script>
+
+  <!-- Terminal typewriter script -->
+  <script>
+    (function() {
+      var terminal = document.getElementById('terminal');
+      var cursor = document.getElementById('cursor');
+      if (!terminal || !cursor) return;
+
+      // Your terminal text, split by newlines (exact same as your original block)
+      var lines = [
+        "[STRATSIGNAL OPS-TERM v3.2.7]",
+        "",
+        "> INIT COMMS_PIPE --profile TACTICAL_NET",
+        "  [OK]  Handshake with NODE: FALCON-ALPHA",
+        "  [OK]  Uplink secured via SIGMA-TUNNEL",
+        "  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE",
+        "  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms",
+        "",
+        "> LOAD MISSION_PROFILE --id MS-2047-RAZOR",
+        "  [OK]  Ruleset: ROE-BLACK",
+        "  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA",
+        "  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK",
+        "",
+        "> LINK_STATUS --verbose",
+        "  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS",
+        "  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS",
+        "  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED",
+        "",
+        "> ROUTE_SCAN --hops 6 --mask 0x7F",
+        "  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]",
+        "  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]",
+        "  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]",
+        "  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]",
+        "  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1",
+        "",
+        "> WATCH CHANNEL TAC-1 --filter=PRIORITY",
+        "  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17",
+        "  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS",
+        "  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3",
+        "",
+        "> TELEMETRY --unit=EAGLE-2",
+        "  POS: 42D-17-09  |  ALT: 231 m",
+        "  VEL: 3.2 m/s    |  HEADING: 087°",
+        "  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%",
+        "",
+        "> SIGNAL_ANALYTICS --window=30s",
+        "  THROUGHPUT: 4.7 Mbps",
+        "  NOISE_FLOOR: -87 dBm",
+        "  INTERFERENCE: LOW",
+        "  JAMMING: NOT DETECTED",
+        "  CONFIDENCE: 98.1%",
+        "",
+        "> OPS_FEED --mode=SCROLL",
+        "  [SYS]  New SITREP uploaded: SRP-26-ALPHA",
+        "  [SYS]  Map layer updated: ISR-DRONE-DELTA",
+        "  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED",
+        "  [SYS]  Auto-archive of low-priority traffic enabled",
+        "",
+        "> EXEC MACRO \"BATTLE-COMMS\"",
+        "  STEP 1: SYNC CLOCKS .......... [OK]",
+        "  STEP 2: VERIFY CALLSIGNS ..... [OK]",
+        "  STEP 3: PUSH FREQ TABLES ..... [OK]",
+        "  STEP 4: ARM FAILOVER LINK .... [OK]",
+        "  RESULT: TACTICAL NET READY",
+        "",
+        "> PROMPT",
+        "stratsignal:/tac_ops/comms $ █"
+      ];
+
+      var i = 0;
+      var speed = 18;  // ms per line – fast but readable
+
+      function printNext() {
+        if (i < lines.length) {
+          // Add line as text node (before cursor)
+          var textNode = document.createTextNode(lines[i] + '\\n');
+          terminal.insertBefore(textNode, cursor);
+          i++;
+          // Auto-scroll to bottom
+          terminal.scrollTop = terminal.scrollHeight;
+          setTimeout(printNext, speed);
+        } else {
+          // Keep cursor blinking after print is done
+          // (cursor is already visible)
+        }
+      }
+
+      printNext();
     })();
   </script>
 </body></html>`;
