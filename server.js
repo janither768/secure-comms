@@ -498,9 +498,23 @@ const renderLogin = () => `<!DOCTYPE html>
 const renderMissionLanding = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
-  body { background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed; display:flex; align-items:center; justify-content:center; height:100%; margin:0; }
-  .choice-box { background: rgba(17,21,28,0.95); border:1px solid #2d3748; padding:40px; text-align:center; }
-  h2 { font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 30px; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+  }
+  .choice-box {
+    background: rgba(17,21,28,0.95);
+    border: 1px solid #2d3748;
+    padding: 40px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+  }
+  h2 { font-family:'Michroma',sans-serif; color:#B85C00; margin: 0 0 30px; }
   .btn-choice { display:inline-block; width:180px; padding:15px; margin:10px; background:#B85C00; color:white; font-family:'Michroma',sans-serif; text-decoration:none; font-size:1em; border:none; cursor:pointer; text-transform:uppercase; }
   .btn-choice.join { background:#5D3FD3; }
 </style></head>
@@ -517,8 +531,21 @@ const renderMissionLanding = () => `<!DOCTYPE html>
 const renderNewMissionForm = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
-  body { background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed; display:flex; align-items:center; justify-content:center; height:100%; margin:0; }
-  .form-container { background: rgba(17,21,28,0.95); border:1px solid #2d3748; padding:25px; width:90%; max-width:450px; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+  }
+  .form-container {
+    background: rgba(17,21,28,0.95);
+    border: 1px solid #2d3748;
+    padding: 25px;
+    width: 90%;
+    max-width: 450px;
+  }
   label { color:#5c748c; font-size:0.7em; display:block; margin-bottom:5px; }
   input, textarea { width:100%; padding:10px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; }
   textarea { resize:none; font-family:monospace; }
@@ -529,12 +556,11 @@ const renderNewMissionForm = () => `<!DOCTYPE html>
     <a href="/mission" class="btn-back">◄ BACK</a>
     <h2 style="font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 20px; font-size:1em;">CREATE MISSION</h2>
     <form method="POST" action="/mission/create">
-    
       <label>MISSION NAME</label>
       <input type="text" name="missionName" required placeholder="OP NIGHTFALL">
 
       <label>CHECKPOINTS (one per line: NAME DIR DIST)</label>
-      <textarea name="checkpoints" rows="5" required placeholder="LZAlpha NE 300&#10;RidgeOverwatch E 500&#10;ExtractPoint SE 200"></textarea>
+      <textarea name="checkpoints" rows="5" required placeholder="LZ Alpha NE 300&#10;Ridge Overwatch E 500&#10;Extract Point SE 200"></textarea>
 
       <label>AUTHORISED CALLSIGNS (comma separated)</label>
       <input type="text" name="callsigns" required placeholder="EAGLE-2,GHOST-7,SPECTRE-4">
@@ -553,11 +579,25 @@ const renderNewMissionForm = () => `<!DOCTYPE html>
 const renderJoinMissionForm = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
-  body { background: #060505; display:flex; align-items:center; justify-content:center; height:100%; margin:0; }
-  .join-box { background:#11151c; border:1px solid #2d3748; padding:30px; width:90%; max-width:400px; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+  }
+  .join-box {
+    background: rgba(17,21,28,0.95);
+    border: 1px solid #2d3748;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
   h2 { font-family:'Michroma',sans-serif; color:#5D3FD3; margin:0 0 20px; }
-  label { color:#5c748c; font-size:0.7em; display:block; margin-bottom:5px; }
-  input { width:100%; padding:10px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; }
+  label { color:#5c748c; font-size:0.7em; display:block; margin-bottom:5px; text-align:left; }
+  input { width:100%; padding:10px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; box-sizing:border-box; }
   .btn-tactical { width:100%; background:#5D3FD3; }
 </style></head>
 <body>
@@ -565,7 +605,6 @@ const renderJoinMissionForm = () => `<!DOCTYPE html>
     <a href="/mission" class="btn-back">◄ BACK</a>
     <h2>JOIN MISSION</h2>
     <form method="POST" action="/mission/join">
-    
       <label>MISSION ID</label>
       <input type="text" name="missionId" required placeholder="1">
 
@@ -585,13 +624,28 @@ const renderMissionDashboard = (id, user, isCreator) => {
   if (!mission) return 'Mission not found';
 
   const statusColor = mission.status === 'ACTIVE' ? '#39ff14' : (mission.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
-  const killButton = isCreator ? `<a href="/mission/kill/${id}" style="color:#ff4c4c; text-decoration:none; font-weight:bold; background:rgba(255,76,76,0.15); padding:4px 8px; border-radius:3px;">[ KILL MISSION ]</a>` : '';
+  const killButton = isCreator ? `<a href="/mission/kill/${id}" class="kill" style="background:#ff4c4c; color:white;">[ KILL MISSION ]</a>` : '';
 
   return `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
-  body { background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed; }
-  .dash-container { max-width: 650px; margin: 40px auto; background: rgba(6,5,5,0.9); border:1px solid #2d3748; padding:25px; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+  }
+  .dash-container {
+    background: rgba(6,5,5,0.9);
+    border: 1px solid #2d3748;
+    padding: 25px;
+    width: 90%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
   h2 { font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 15px; }
   .info-row { display:flex; justify-content:space-between; border-bottom:1px solid #2d3748; padding:8px 0; color:#a1b0c0; }
   .label { color:#5c748c; font-weight:bold; }
@@ -599,10 +653,10 @@ const renderMissionDashboard = (id, user, isCreator) => {
   a { text-decoration:none; font-family:'Michroma',sans-serif; padding:8px 16px; border:1px solid #2d3748; color:white; background:#1c2b36; }
   a.map { background:#5D3FD3; }
   a.chat { background:#39ff14; color:#000; }
-  a.kill { background:#ff4c4c; color:white; }
 </style></head>
 <body>
   <div class="dash-container">
+    <a href="/" class="btn-back">◄ BACK TO HUB</a>
     <h2>${escapeHtml(mission.missionName)} <span style="font-size:0.7em; color:${statusColor};">[${mission.status}]</span></h2>
     <div class="info-row"><span class="label">Mission ID:</span> <span>${id}</span></div>
     <div class="info-row"><span class="label">Creator:</span> <span>${escapeHtml(mission.creatorCallsign)}</span></div>
@@ -610,8 +664,6 @@ const renderMissionDashboard = (id, user, isCreator) => {
     <div class="info-row"><span class="label">Operators:</span> <span>${mission.authorizedCallsigns.join(', ')}</span></div>
     <div class="info-row"><span class="label">Status:</span> <span>${mission.status}</span></div>
     <div class="info-row"><span class="label">Calling in as:</span> <span>${escapeHtml(user)}</span></div>
-    <a href="/" class="btn-back">◄ BACK TO HUB</a>
-    <h2>${escapeHtml(mission.missionName)} <span style="font-size:0.7em; color:${statusColor};">[${mission.status}]</span></h2>
 
     <div class="actions">
       <a href="/brief/${id}" class="map">MAP BRIEF</a>
