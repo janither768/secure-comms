@@ -648,7 +648,7 @@ const renderMissionDashboard = (id, user, isCreator) => {
     if (lastSeen) {
       const deltaSec = Math.floor((Date.now() - lastSeen) / 1000);
       
-      if (deltaSec <= 15) {
+      if (deltaSec <= 30) {
         statusText = 'LIVE // ONLINE';
         statusColor = '#39ff14'; // Tactical green
         badgeStyle = 'background: #39ff14; color: #000; font-weight: bold;';
@@ -668,9 +668,16 @@ const renderMissionDashboard = (id, user, isCreator) => {
     }
 
     // Append localized role descriptors safely
-    const isOpCreator = cleanCallsign.toLowerCase() === creator.toLowerCase();
-    const isSelf = cleanCallsign.toLowerCase() === user.toLowerCase();
-    const roleTag = isOpCreator ? '<span class="op-role">[COMMANDER]</span>' : (isSelf ? '<span class="op-role" style="color:#39ff14;">[YOU]</span>' : '');
+   const isOpCreator = cleanCallsign.toLowerCase() === creator.toLowerCase();
+   const isSelf = cleanCallsign.toLowerCase() === user.toLowerCase();
+
+   let roleTag = '';
+   if (isOpCreator) {
+   roleTag += '<span class="op-role">[COMMANDER]</span> ';
+   }
+   if (isSelf) {
+   roleTag += '<span class="op-role" style="color:#39ff14;">[YOU]</span>';
+   }
 
     return `
       <div class="roster-card" style="border-left: 4px solid ${statusColor};">
