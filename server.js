@@ -561,29 +561,6 @@ const renderJoinMissionForm = () => `<!DOCTYPE html>
   </div>
 </body></html>`;
 
-const renderJoinMission = (id) => {
-  const mission = briefs[id];
-  if (!mission || !mission.isMission) return 'Mission not found';
-  return `<!DOCTYPE html>
-<html><head>${metaViewport}${fontImport}<style>
-  ${commonStyle}
-  body { background: #060505; display:flex; align-items:center; justify-content:center; height:100%; margin:0; }
-  .join-box { background:#11151c; border:1px solid #2d3748; padding:25px; text-align:center; }
-  input { width:100%; padding:12px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; }
-  .btn-tactical { width:100%; background:#39ff14; color:#000; }
-</style></head>
-<body>
-  <div class="join-box">
-    <h3 style="color:#39ff14; font-family:'Michroma',sans-serif;">JOIN MISSION: ${escapeHtml(mission.missionName)}</h3>
-    <p style="color:#5c748c; font-size:0.8em;">Authorised operators only</p>
-    <form method="POST" action="/mission/join/${id}">
-      <input type="text" name="callsign" placeholder="Your callsign" required>
-      <button type="submit" class="btn-tactical">JOIN CHANNEL</button>
-    </form>
-  </div>
-</body></html>`;
-};
-
 const renderMissionDashboard = (id, user, isCreator) => {
   const mission = briefs[id];
   if (!mission) return 'Mission not found';
@@ -1080,27 +1057,10 @@ app.get('/', (req, res) => {
   res.send(renderLanding({ totalOps, activeChannels, totalMessages, uptimeStr }));
 });
 
-app.get('/mission/join/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  res.send(renderJoinMission(id));
-});
-
-app.post('/mission/join/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const mission = briefs[id];
-  if (!mission || !mission.isMission) return res.redirect('/mission');
-  const { callsign } = req.body;
-  if (!callsign || !mission.authorizedCallsigns.includes(callsign.trim())) {
-    return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: CALLSIGN NOT AUTHORISED</div></body>");
-  }
-  res.redirect(`/chat?user=${encodeURIComponent(callsign.trim())}&room=${encodeURIComponent(mission.room)}`);
-});
-
 app.get('/chat', (req, res) => {
   const { user, room } = req.query;
   const constraints = roomConstraints[room];
   
-  // If room has constraints, check authorization
   if (constraints) {
     // New mission-style authorized list
     if (constraints.authorized) {
@@ -1108,22 +1068,13 @@ app.get('/chat', (req, res) => {
         return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
       }
     } 
-    // Old-style single target+creator check (for legacy channels)
-    else if (user !== constraints.target && user !== constraints.creator) {
+    // Old-style single target+creator check (casual locked channel)
+    else if (constraints.target && user !== constraints.target && user !== constraints.creator) {
       return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
     }
   }
   
   res.send(renderChat(user, room));
-});
-
-app.get('/mission/kill/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (briefs[id] && briefs[id].isMission) {
-    delete roomConstraints[ briefs[id].room ];
-    delete briefs[id];
-  }
-  res.redirect('/mission');
 });
 
 app.get('/mission/kill/:id', (req, res) => {
@@ -1253,26 +1204,6 @@ app.post('/login', (req, res) => {
   const { username, passcode, target } = req.body;
   if (target) roomConstraints[passcode] = { target, creator: username };
   res.redirect(`/chat?user=${encodeURIComponent(username)}&room=${encodeURIComponent(passcode)}`);
-});
-
-app.get('/chat', (req, res) => {
-  const { user, room } = req.query;
-  const constraints = roomConstraints[room];
-  
-  if (constraints) {
-    // New mission-style authorized list
-    if (constraints.authorized) {
-      if (!user || !constraints.authorized.includes(user)) {
-        return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
-      }
-    } 
-    // Old-style single target+creator check (kept for legacy casual locked channels)
-    else if (constraints.target && user !== constraints.target && user !== constraints.creator) {
-      return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
-    }
-  }
-  
-  res.send(renderChat(user, room));
 });
 
 app.post('/send', (req, res) => {
