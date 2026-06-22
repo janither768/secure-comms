@@ -134,7 +134,7 @@ const renderLanding = (stats = {}) => {
     align-items: center;
   }
  .buttons-col .btn-tactical {
-  width: 240px;          /* fixed width, identical for both */
+  width: 250px;          /* fixed width, identical for both */
   min-width: unset;      /* remove the min‑width so it doesn’t override */
   box-shadow: none;
   padding: 12px 24px;
@@ -251,10 +251,10 @@ const renderLanding = (stats = {}) => {
       <!-- Buttons middle -->
       <div class="buttons-col">
         <button class="btn-tactical" onclick="window.location.href='/boot'">
-          [ ENGAGE CHANNEL ]
+          ENGAGE CHANNEL
         </button>
         <button class="btn-tactical btn-brief" onclick="window.location.href='/mission'">
-  [ MISSION MODE ]
+  MISSION MODE
 </button>
       </div>
 
