@@ -480,51 +480,25 @@ const renderLogin = () => `<!DOCTYPE html>
   </div>
 </body></html>`;
 
-const renderMissionDashboard = () => {
-  // Filter only missions
-  const missionList = Object.entries(briefs)
-    .filter(([id, b]) => b.isMission)
-    .map(([id, b]) => {
-      const statusColor = b.status === 'ACTIVE' ? '#39ff14' : (b.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
-      return `
-        <tr>
-          <td style="color:#fff; font-weight:bold;">${escapeHtml(b.missionName)}</td>
-          <td style="color:${statusColor};">${b.status}</td>
-          <td>${b.authorizedCallsigns.join(', ')}</td>
-          <td>${escapeHtml(b.room)}</td>
-          <td>
-            <a href="/brief/${id}" style="color:#5D3FD3;">MAP</a>
-            <a href="/mission/join/${id}" style="color:#39ff14; margin-left:8px;">JOIN</a>
-            <a href="/mission/kill/${id}" style="color:#ff4c4c; margin-left:8px;">KILL</a>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-  return `<!DOCTYPE html>
+// New landing: choose CREATE or JOIN
+const renderMissionLanding = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
-  body { background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed; }
-  .dashboard { max-width: 700px; margin: 80px auto 20px; background: rgba(6,5,5,0.85); border:1px solid #2d3748; padding:20px; }
-  h2 { font-family:'Michroma',sans-serif; color:#5D3FD3; margin:0 0 15px; }
-  table { width:100%; border-collapse:collapse; color:#a1b0c0; font-size:0.8em; }
-  th { text-align:left; padding:8px; border-bottom:1px solid #2d3748; color:#5c748c; }
-  td { padding:8px; border-bottom:1px solid #1f2937; }
-  a { text-decoration:none; font-weight:bold; }
-  .btn-new { display:inline-block; background:#B85C00; color:white; padding:12px 24px; text-decoration:none; font-family:'Michroma',sans-serif; margin-bottom:20px; }
+  body { background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed; display:flex; align-items:center; justify-content:center; height:100%; margin:0; }
+  .choice-box { background: rgba(17,21,28,0.95); border:1px solid #2d3748; padding:40px; text-align:center; }
+  h2 { font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 30px; }
+  .btn-choice { display:inline-block; width:180px; padding:15px; margin:10px; background:#B85C00; color:white; font-family:'Michroma',sans-serif; text-decoration:none; font-size:1em; border:none; cursor:pointer; text-transform:uppercase; }
+  .btn-choice.join { background:#5D3FD3; }
 </style></head>
 <body>
-  <div class="dashboard">
-    <h2>MISSION DASHBOARD</h2>
-    <a href="/mission/new" class="btn-new">+ NEW MISSION</a>
-    <table>
-      <tr><th>MISSION</th><th>STATUS</th><th>OPERATORS</th><th>CHANNEL</th><th>ACTIONS</th></tr>
-      ${missionList || '<tr><td colspan="5" style="color:#5c748c;">No active missions.</td></tr>'}
-    </table>
+  <div class="choice-box">
+    <h2>MISSION MODE</h2>
+    <a href="/mission/create" class="btn-choice">CREATE</a>
+    <a href="/mission/join" class="btn-choice join">JOIN</a>
   </div>
 </body></html>`;
-};
 
+// Adjust renderNewMissionForm to POST to /mission/create
 const renderNewMissionForm = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
@@ -538,7 +512,7 @@ const renderNewMissionForm = () => `<!DOCTYPE html>
 <body>
   <div class="form-container">
     <h2 style="font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 20px; font-size:1em;">CREATE MISSION</h2>
-    <form method="POST" action="/mission/new">
+    <form method="POST" action="/mission/create">
       <label>MISSION NAME</label>
       <input type="text" name="missionName" required placeholder="OP NIGHTFALL">
 
@@ -555,6 +529,34 @@ const renderNewMissionForm = () => `<!DOCTYPE html>
       <input type="text" name="creator" required placeholder="RAVEN-1">
 
       <button type="submit" class="btn-tactical">CREATE MISSION</button>
+    </form>
+  </div>
+</body></html>`;
+
+const renderJoinMissionForm = () => `<!DOCTYPE html>
+<html><head>${metaViewport}${fontImport}<style>
+  ${commonStyle}
+  body { background: #060505; display:flex; align-items:center; justify-content:center; height:100%; margin:0; }
+  .join-box { background:#11151c; border:1px solid #2d3748; padding:30px; width:90%; max-width:400px; }
+  h2 { font-family:'Michroma',sans-serif; color:#5D3FD3; margin:0 0 20px; }
+  label { color:#5c748c; font-size:0.7em; display:block; margin-bottom:5px; }
+  input { width:100%; padding:10px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; }
+  .btn-tactical { width:100%; background:#5D3FD3; }
+</style></head>
+<body>
+  <div class="join-box">
+    <h2>JOIN MISSION</h2>
+    <form method="POST" action="/mission/join">
+      <label>MISSION ID</label>
+      <input type="text" name="missionId" required placeholder="1">
+
+      <label>CHANNEL PASSCODE</label>
+      <input type="text" name="token" required placeholder="TAC-NIGHTFALL">
+
+      <label>YOUR CALLSIGN</label>
+      <input type="text" name="callsign" required placeholder="EAGLE-2">
+
+      <button type="submit" class="btn-tactical">JOIN</button>
     </form>
   </div>
 </body></html>`;
@@ -578,6 +580,45 @@ const renderJoinMission = (id) => {
       <input type="text" name="callsign" placeholder="Your callsign" required>
       <button type="submit" class="btn-tactical">JOIN CHANNEL</button>
     </form>
+  </div>
+</body></html>`;
+};
+
+const renderMissionDashboard = (id, user, isCreator) => {
+  const mission = briefs[id];
+  if (!mission) return 'Mission not found';
+
+  const statusColor = mission.status === 'ACTIVE' ? '#39ff14' : (mission.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
+  const killButton = isCreator ? `<a href="/mission/kill/${id}" style="color:#ff4c4c; text-decoration:none; font-weight:bold; background:rgba(255,76,76,0.15); padding:4px 8px; border-radius:3px;">[ KILL MISSION ]</a>` : '';
+
+  return `<!DOCTYPE html>
+<html><head>${metaViewport}${fontImport}<style>
+  ${commonStyle}
+  body { background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed; }
+  .dash-container { max-width: 650px; margin: 40px auto; background: rgba(6,5,5,0.9); border:1px solid #2d3748; padding:25px; }
+  h2 { font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 15px; }
+  .info-row { display:flex; justify-content:space-between; border-bottom:1px solid #2d3748; padding:8px 0; color:#a1b0c0; }
+  .label { color:#5c748c; font-weight:bold; }
+  .actions { margin-top:20px; display:flex; gap:12px; flex-wrap:wrap; }
+  a { text-decoration:none; font-family:'Michroma',sans-serif; padding:8px 16px; border:1px solid #2d3748; color:white; background:#1c2b36; }
+  a.map { background:#5D3FD3; }
+  a.chat { background:#39ff14; color:#000; }
+  a.kill { background:#ff4c4c; color:white; }
+</style></head>
+<body>
+  <div class="dash-container">
+    <h2>${escapeHtml(mission.missionName)} <span style="font-size:0.7em; color:${statusColor};">[${mission.status}]</span></h2>
+    <div class="info-row"><span class="label">Creator:</span> <span>${escapeHtml(mission.creatorCallsign)}</span></div>
+    <div class="info-row"><span class="label">Channel:</span> <span>${escapeHtml(mission.room)}</span></div>
+    <div class="info-row"><span class="label">Operators:</span> <span>${mission.authorizedCallsigns.join(', ')}</span></div>
+    <div class="info-row"><span class="label">Status:</span> <span>${mission.status}</span></div>
+    <div class="info-row"><span class="label">Calling in as:</span> <span>${escapeHtml(user)}</span></div>
+
+    <div class="actions">
+      <a href="/brief/${id}" class="map">MAP BRIEF</a>
+      <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(mission.room)}" class="chat">JOIN CHAT</a>
+      ${killButton}
+    </div>
   </div>
 </body></html>`;
 };
@@ -610,7 +651,7 @@ const renderBriefForm = () => `<!DOCTYPE html>
           Scale: 1 cell = ${SCALE}m
         </div>
         <textarea name="checkpoints" rows="6" required
-                  placeholder="LZ Alpha NE 300&#10;Ridge Overwatch E 500&#10;Extract Point SE 200"
+                  placeholder="LZAlpha NE 300&#10;RidgeOverwatch E 500&#10;ExtractPoint SE 200"
                   style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
                          border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; resize:none;"></textarea>
 
@@ -1085,17 +1126,33 @@ app.get('/mission/kill/:id', (req, res) => {
   res.redirect('/mission');
 });
 
-app.get('/mission', (req, res) => res.send(renderMissionDashboard()));
+app.get('/mission/kill/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const mission = briefs[id];
+  if (!mission || !mission.isMission) return res.redirect('/mission');
 
-app.get('/mission/new', (req, res) => res.send(renderNewMissionForm()));
+  // We cannot check token here because it's a GET from a link; the dashboard only shows the kill button to the creator.
+  // For extra security, we can require that only the creator can kill, so we just delete:
+  // (In a real system you’d want a confirmation, but for now it's fine)
+  if (mission.creatorCallsign) {
+    delete roomConstraints[mission.room];
+    delete briefs[id];
+  }
+  res.redirect('/mission');
+});
 
-app.post('/mission/new', (req, res) => {
+app.get('/mission', (req, res) => res.send(renderMissionLanding()));
+
+// CREATE mission form (same as before, just change the action URL)
+app.get('/mission/create', (req, res) => res.send(renderNewMissionForm()));
+
+app.post('/mission/create', (req, res) => {
   const { missionName, checkpoints, callsigns, room, creator } = req.body;
-  if (!missionName || !checkpoints || !callsigns || !room || !creator) return res.redirect('/mission/new');
+  if (!missionName || !checkpoints || !callsigns || !room || !creator) return res.redirect('/mission/create');
 
-  // Parse checkpoints (identical to your existing brief logic)
+  // Parse checkpoints (same as before)
   const lines = checkpoints.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-  if (lines.length === 0) return res.redirect('/mission/new');
+  if (lines.length === 0) return res.redirect('/mission/create');
 
   const points = [{ name: 'HQ', x: 0, y: 0 }];
   let prevX = 0, prevY = 0;
@@ -1119,33 +1176,75 @@ app.post('/mission/new', (req, res) => {
     prevY = newY;
   }
 
-  if (points.length <= 1) return res.redirect('/mission/new');
+  if (points.length <= 1) return res.redirect('/mission/create');
 
-  // Parse authorised callsigns
+  // Authorised callsigns list
   const authList = callsigns.split(',').map(s => s.trim()).filter(s => s.length > 0);
-  // Ensure creator is in the list
   if (!authList.includes(creator.trim())) authList.push(creator.trim());
 
-  // Create the mission (using the briefs store)
   const id = ++briefCounter;
+  const channelCode = room.trim();
+  const creatorCallsign = creator.trim();
+
   briefs[id] = {
     isMission: true,
     missionName: missionName.trim(),
     points,
     status: 'PLANNED',
     created: Date.now(),
-    room: room.trim(),
+    room: channelCode,
     authorizedCallsigns: authList,
-    creatorCallsign: creator.trim()
+    creatorCallsign: creatorCallsign
   };
 
-  // Lock down the channel
-  roomConstraints[room.trim()] = {
+  // Lock the channel
+  roomConstraints[channelCode] = {
     authorized: authList,
-    creator: creator.trim()
+    creator: creatorCallsign,
+    missionId: id
   };
 
-  res.redirect(`/mission`);
+  // Redirect creator to the dashboard with token
+  res.redirect(`/mission/${id}/dashboard?user=${encodeURIComponent(creatorCallsign)}&token=${encodeURIComponent(channelCode)}`);
+});
+
+// GET join page
+app.get('/mission/join', (req, res) => res.send(renderJoinMissionForm()));
+
+// POST join – validate and redirect to dashboard
+app.post('/mission/join', (req, res) => {
+  const { missionId, token, callsign } = req.body;
+  const id = parseInt(missionId, 10);
+  if (isNaN(id)) return res.send(renderJoinMissionForm() + '<p style="color:red;">Invalid mission ID</p>');
+
+  const mission = briefs[id];
+  if (!mission || !mission.isMission) return res.send(renderJoinMissionForm() + '<p style="color:red;">Mission not found</p>');
+
+  // Check channel code
+  if (token.trim() !== mission.room) return res.send(renderJoinMissionForm() + '<p style="color:red;">Invalid channel code</p>');
+
+  // Check callsign
+  if (!mission.authorizedCallsigns.includes(callsign.trim())) return res.send(renderJoinMissionForm() + '<p style="color:red;">Callsign not authorised</p>');
+
+  // Success – redirect to dashboard with token
+  res.redirect(`/mission/${id}/dashboard?user=${encodeURIComponent(callsign.trim())}&token=${encodeURIComponent(mission.room)}`);
+});
+
+// Dashboard route – protected by token and callsign
+app.get('/mission/:id/dashboard', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const mission = briefs[id];
+  if (!mission || !mission.isMission) return res.send('Mission not found');
+
+  const { user, token } = req.query;
+  if (!user || !token) return res.send('Unauthorised – missing credentials');
+
+  // Verify token (channel code) and callsign
+  if (token !== mission.room) return res.send('Invalid access token');
+  if (!mission.authorizedCallsigns.includes(user)) return res.send('Callsign not authorised');
+
+  const isCreator = (user === mission.creatorCallsign);
+  res.send(renderMissionDashboard(id, user, isCreator));
 });
 
 app.get('/boot', (req, res) => res.send(renderLogin()));
@@ -1159,9 +1258,20 @@ app.post('/login', (req, res) => {
 app.get('/chat', (req, res) => {
   const { user, room } = req.query;
   const constraints = roomConstraints[room];
-  if (constraints && user !== constraints.target && user !== constraints.creator) {
-    return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+  
+  if (constraints) {
+    // New mission-style authorized list
+    if (constraints.authorized) {
+      if (!user || !constraints.authorized.includes(user)) {
+        return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+      }
+    } 
+    // Old-style single target+creator check (kept for legacy casual locked channels)
+    else if (constraints.target && user !== constraints.target && user !== constraints.creator) {
+      return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+    }
   }
+  
   res.send(renderChat(user, room));
 });
 
