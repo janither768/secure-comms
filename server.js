@@ -277,8 +277,10 @@ const renderLanding = (stats = {}) => {
 <script>
 (function() {
   var terminal = document.getElementById('terminal');
-  var cursor = document.getElementById('cursor');
-  if (!terminal || !cursor) return;
+  if (!terminal) return;
+
+  // remove the placeholder cursor span – we'll recreate it
+  terminal.innerHTML = '';
 
   var lines = [
     "[STRATSIGNAL OPS-TERM v3.2.7]",
@@ -337,27 +339,35 @@ const renderLanding = (stats = {}) => {
     "  RESULT: TACTICAL NET READY",
     "",
     "> PROMPT",
-    "stratsignal:/tac_ops/comms $ " + String.fromCharCode(9608)  // full block cursor
+    "stratsignal:/tac_ops/comms $ " + String.fromCharCode(9608)
   ];
 
   var i = 0;
-  var speed = 20;  // ms per line – fast and readable
+  var speed = 20;
+
+  // Create a blinking cursor element and keep it always at the end
+  var cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  cursor.id = 'cursor';
+  // give it a tiny space to hold the shape
+  cursor.innerHTML = '&nbsp;';
 
   function printNext() {
     if (i < lines.length) {
-      // Add text line
-      var textNode = document.createTextNode(lines[i]);
-      terminal.insertBefore(textNode, cursor);
-      // Add line break
-      var br = document.createElement('br');
-      terminal.insertBefore(br, cursor);
-      i++;
-      // Scroll to bottom
+      // create a line container (text node would work too, but a div is easier)
+      var lineDiv = document.createElement('div');
+      lineDiv.textContent = lines[i];
+      terminal.appendChild(lineDiv);
+      // move cursor to the very end
+      terminal.appendChild(cursor);
       terminal.scrollTop = terminal.scrollHeight;
+      i++;
       setTimeout(printNext, speed);
     }
   }
 
+  // Start with cursor already visible
+  terminal.appendChild(cursor);
   printNext();
 })();
 </script>
