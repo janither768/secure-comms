@@ -865,6 +865,14 @@ const renderChat = (user, room) => {
   }
   if (activeCount === 0) delete activeUsers[room];
 
+    // Check if this is a mission channel
+  const constraints = roomConstraints[room];
+  const isMissionChat = constraints && constraints.missionId;
+  const missionDashboardLink = isMissionChat
+    ? `<a href="/mission/${constraints.missionId}/dashboard?user=${encodeURIComponent(user)}&token=${encodeURIComponent(room)}" 
+         style="color:#B85C00; background:rgba(184,92,0,0.15); padding:2px 8px; border-radius:3px; text-decoration:none;">[ MISSION DASHBOARD ]</a>`
+    : '';
+
   const isSecure = activeCount >= 2;
   const connectionText = `${activeCount} OPERATORS CONNECTED`;
 
@@ -1071,12 +1079,15 @@ const renderChat = (user, room) => {
   <div id="messages">
     ${chatHtml}
   </div>
-
-  <!-- Toolbar -->
+   <!-- Toolbar -->
   <div id="bottom-bar">
     <a href="data:text/plain;base64,${encodedExport}" download="chat.txt">[ CONVO DOWNLOAD ]</a>
+    <span style="color:#2d3748; margin:0 3px;">|</span>
     <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}">[ PING ]</a>
+    ${isMissionChat ? '<span style="color:#2d3748; margin:0 3px;">|</span>' + missionDashboardLink : ''}
+    <span style="color:#2d3748; margin:0 3px;">|</span>
     <a href="/purge?room=${encodeURIComponent(room)}" class="kill">[ KILL ]</a>
+    <span style="color:#2d3748; margin:0 3px;">|</span>
     <a href="/boot" style="color:#83EC2D; background:rgba(131,236,45,0.15);">[ SWAP ]</a>
   </div>
 
