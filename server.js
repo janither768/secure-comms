@@ -239,9 +239,9 @@ const renderLanding = (stats = {}) => {
         <button class="btn-tactical" onclick="window.location.href='/boot'">
           [ ENGAGE CHANNEL ]
         </button>
-        <button class="btn-tactical btn-brief" onclick="window.location.href='/brief'">
-          [ MISSION BRIEF ]
-        </button>
+        <button class="btn-tactical btn-brief" onclick="window.location.href='/mission'">
+  [ MISSION MODE ]
+</button>
       </div>
 
       <!-- Terminal right – line-by-line typewriter -->
@@ -479,6 +479,109 @@ const renderLogin = () => `<!DOCTYPE html>
     </form>
   </div>
 </body></html>`;
+
+const renderMissionDashboard = () => {
+  // Filter only missions
+  const missionList = Object.entries(briefs)
+    .filter(([id, b]) => b.isMission)
+    .map(([id, b]) => {
+      const statusColor = b.status === 'ACTIVE' ? '#39ff14' : (b.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
+      return `
+        <tr>
+          <td style="color:#fff; font-weight:bold;">${escapeHtml(b.missionName)}</td>
+          <td style="color:${statusColor};">${b.status}</td>
+          <td>${b.authorizedCallsigns.join(', ')}</td>
+          <td>${escapeHtml(b.room)}</td>
+          <td>
+            <a href="/brief/${id}" style="color:#5D3FD3;">MAP</a>
+            <a href="/mission/join/${id}" style="color:#39ff14; margin-left:8px;">JOIN</a>
+            <a href="/mission/kill/${id}" style="color:#ff4c4c; margin-left:8px;">KILL</a>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+  return `<!DOCTYPE html>
+<html><head>${metaViewport}${fontImport}<style>
+  ${commonStyle}
+  body { background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed; }
+  .dashboard { max-width: 700px; margin: 80px auto 20px; background: rgba(6,5,5,0.85); border:1px solid #2d3748; padding:20px; }
+  h2 { font-family:'Michroma',sans-serif; color:#5D3FD3; margin:0 0 15px; }
+  table { width:100%; border-collapse:collapse; color:#a1b0c0; font-size:0.8em; }
+  th { text-align:left; padding:8px; border-bottom:1px solid #2d3748; color:#5c748c; }
+  td { padding:8px; border-bottom:1px solid #1f2937; }
+  a { text-decoration:none; font-weight:bold; }
+  .btn-new { display:inline-block; background:#B85C00; color:white; padding:12px 24px; text-decoration:none; font-family:'Michroma',sans-serif; margin-bottom:20px; }
+</style></head>
+<body>
+  <div class="dashboard">
+    <h2>MISSION DASHBOARD</h2>
+    <a href="/mission/new" class="btn-new">+ NEW MISSION</a>
+    <table>
+      <tr><th>MISSION</th><th>STATUS</th><th>OPERATORS</th><th>CHANNEL</th><th>ACTIONS</th></tr>
+      ${missionList || '<tr><td colspan="5" style="color:#5c748c;">No active missions.</td></tr>'}
+    </table>
+  </div>
+</body></html>`;
+};
+
+const renderNewMissionForm = () => `<!DOCTYPE html>
+<html><head>${metaViewport}${fontImport}<style>
+  ${commonStyle}
+  body { background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed; display:flex; align-items:center; justify-content:center; height:100%; margin:0; }
+  .form-container { background: rgba(17,21,28,0.95); border:1px solid #2d3748; padding:25px; width:90%; max-width:450px; }
+  label { color:#5c748c; font-size:0.7em; display:block; margin-bottom:5px; }
+  input, textarea { width:100%; padding:10px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; }
+  textarea { resize:none; font-family:monospace; }
+  .btn-tactical { width:100%; background:#B85C00; }
+</style></head>
+<body>
+  <div class="form-container">
+    <h2 style="font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 20px; font-size:1em;">CREATE MISSION</h2>
+    <form method="POST" action="/mission/new">
+      <label>MISSION NAME</label>
+      <input type="text" name="missionName" required placeholder="OP NIGHTFALL">
+
+      <label>CHECKPOINTS (one per line: NAME DIR DIST)</label>
+      <textarea name="checkpoints" rows="5" required placeholder="LZ Alpha NE 300&#10;Ridge Overwatch E 500&#10;Extract Point SE 200"></textarea>
+
+      <label>AUTHORISED CALLSIGNS (comma separated)</label>
+      <input type="text" name="callsigns" required placeholder="EAGLE-2,GHOST-7,SPECTRE-4">
+
+      <label>CHANNEL PASSCODE</label>
+      <input type="text" name="room" required placeholder="TAC-NIGHTFALL">
+
+      <label>YOUR CALLSIGN (creator)</label>
+      <input type="text" name="creator" required placeholder="RAVEN-1">
+
+      <button type="submit" class="btn-tactical">CREATE MISSION</button>
+    </form>
+  </div>
+</body></html>`;
+
+const renderJoinMission = (id) => {
+  const mission = briefs[id];
+  if (!mission || !mission.isMission) return 'Mission not found';
+  return `<!DOCTYPE html>
+<html><head>${metaViewport}${fontImport}<style>
+  ${commonStyle}
+  body { background: #060505; display:flex; align-items:center; justify-content:center; height:100%; margin:0; }
+  .join-box { background:#11151c; border:1px solid #2d3748; padding:25px; text-align:center; }
+  input { width:100%; padding:12px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; }
+  .btn-tactical { width:100%; background:#39ff14; color:#000; }
+</style></head>
+<body>
+  <div class="join-box">
+    <h3 style="color:#39ff14; font-family:'Michroma',sans-serif;">JOIN MISSION: ${escapeHtml(mission.missionName)}</h3>
+    <p style="color:#5c748c; font-size:0.8em;">Authorised operators only</p>
+    <form method="POST" action="/mission/join/${id}">
+      <input type="text" name="callsign" placeholder="Your callsign" required>
+      <button type="submit" class="btn-tactical">JOIN CHANNEL</button>
+    </form>
+  </div>
+</body></html>`;
+};
+
 // ============ PHASE 2: BRIEF ============
 const renderBriefForm = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
@@ -934,6 +1037,115 @@ app.get('/', (req, res) => {
   const uptimeStr = `${days}D ${String(hours).padStart(2, '0')}H ${String(minutes).padStart(2, '0')}M`;
 
   res.send(renderLanding({ totalOps, activeChannels, totalMessages, uptimeStr }));
+});
+
+app.get('/mission/join/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  res.send(renderJoinMission(id));
+});
+
+app.post('/mission/join/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const mission = briefs[id];
+  if (!mission || !mission.isMission) return res.redirect('/mission');
+  const { callsign } = req.body;
+  if (!callsign || !mission.authorizedCallsigns.includes(callsign.trim())) {
+    return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: CALLSIGN NOT AUTHORISED</div></body>");
+  }
+  res.redirect(`/chat?user=${encodeURIComponent(callsign.trim())}&room=${encodeURIComponent(mission.room)}`);
+});
+
+app.get('/chat', (req, res) => {
+  const { user, room } = req.query;
+  const constraints = roomConstraints[room];
+  
+  // If room has constraints, check authorization
+  if (constraints) {
+    // New mission-style authorized list
+    if (constraints.authorized) {
+      if (!user || !constraints.authorized.includes(user)) {
+        return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+      }
+    } 
+    // Old-style single target+creator check (for legacy channels)
+    else if (user !== constraints.target && user !== constraints.creator) {
+      return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+    }
+  }
+  
+  res.send(renderChat(user, room));
+});
+
+app.get('/mission/kill/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (briefs[id] && briefs[id].isMission) {
+    delete roomConstraints[ briefs[id].room ];
+    delete briefs[id];
+  }
+  res.redirect('/mission');
+});
+
+app.get('/mission', (req, res) => res.send(renderMissionDashboard()));
+
+app.get('/mission/new', (req, res) => res.send(renderNewMissionForm()));
+
+app.post('/mission/new', (req, res) => {
+  const { missionName, checkpoints, callsigns, room, creator } = req.body;
+  if (!missionName || !checkpoints || !callsigns || !room || !creator) return res.redirect('/mission/new');
+
+  // Parse checkpoints (identical to your existing brief logic)
+  const lines = checkpoints.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  if (lines.length === 0) return res.redirect('/mission/new');
+
+  const points = [{ name: 'HQ', x: 0, y: 0 }];
+  let prevX = 0, prevY = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const parts = lines[i].split(/\s+/);
+    if (parts.length < 3) continue;
+    const name = parts[0];
+    const dir = parts[1].toUpperCase();
+    const dist = parseInt(parts[2], 10);
+
+    if (!dirVectors[dir] || isNaN(dist) || dist <= 0) continue;
+    const steps = Math.round(dist / SCALE);
+    if (steps < 1) continue;
+
+    const vec = dirVectors[dir];
+    const newX = prevX + vec.dx * steps;
+    const newY = prevY + vec.dy * steps;
+    points.push({ name, x: newX, y: newY });
+    prevX = newX;
+    prevY = newY;
+  }
+
+  if (points.length <= 1) return res.redirect('/mission/new');
+
+  // Parse authorised callsigns
+  const authList = callsigns.split(',').map(s => s.trim()).filter(s => s.length > 0);
+  // Ensure creator is in the list
+  if (!authList.includes(creator.trim())) authList.push(creator.trim());
+
+  // Create the mission (using the briefs store)
+  const id = ++briefCounter;
+  briefs[id] = {
+    isMission: true,
+    missionName: missionName.trim(),
+    points,
+    status: 'PLANNED',
+    created: Date.now(),
+    room: room.trim(),
+    authorizedCallsigns: authList,
+    creatorCallsign: creator.trim()
+  };
+
+  // Lock down the channel
+  roomConstraints[room.trim()] = {
+    authorized: authList,
+    creator: creator.trim()
+  };
+
+  res.redirect(`/mission`);
 });
 
 app.get('/boot', (req, res) => res.send(renderLogin()));
