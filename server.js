@@ -454,7 +454,6 @@ const renderLogin = () => `<!DOCTYPE html>
     width: 100%;
     padding: 14px;
     font-size: 16px;
-    text-align: center;
   }
 </style></head>
 <body>
