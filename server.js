@@ -273,95 +273,94 @@ const renderLanding = (stats = {}) => {
     })();
   </script>
 
-  <!-- Terminal typewriter script -->
-  <script>
-    (function() {
-      var terminal = document.getElementById('terminal');
-      var cursor = document.getElementById('cursor');
-      if (!terminal || !cursor) return;
+  <!-- Terminal typewriter script (FIXED) -->
+<script>
+(function() {
+  var terminal = document.getElementById('terminal');
+  var cursor = document.getElementById('cursor');
+  if (!terminal || !cursor) return;
 
-      // Your terminal text, split by newlines (exact same as your original block)
-      var lines = [
-        "[STRATSIGNAL OPS-TERM v3.2.7]",
-        "",
-        "> INIT COMMS_PIPE --profile TACTICAL_NET",
-        "  [OK]  Handshake with NODE: FALCON-ALPHA",
-        "  [OK]  Uplink secured via SIGMA-TUNNEL",
-        "  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE",
-        "  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms",
-        "",
-        "> LOAD MISSION_PROFILE --id MS-2047-RAZOR",
-        "  [OK]  Ruleset: ROE-BLACK",
-        "  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA",
-        "  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK",
-        "",
-        "> LINK_STATUS --verbose",
-        "  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS",
-        "  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS",
-        "  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED",
-        "",
-        "> ROUTE_SCAN --hops 6 --mask 0x7F",
-        "  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]",
-        "  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]",
-        "  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]",
-        "  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]",
-        "  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1",
-        "",
-        "> WATCH CHANNEL TAC-1 --filter=PRIORITY",
-        "  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17",
-        "  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS",
-        "  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3",
-        "",
-        "> TELEMETRY --unit=EAGLE-2",
-        "  POS: 42D-17-09  |  ALT: 231 m",
-        "  VEL: 3.2 m/s    |  HEADING: 087°",
-        "  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%",
-        "",
-        "> SIGNAL_ANALYTICS --window=30s",
-        "  THROUGHPUT: 4.7 Mbps",
-        "  NOISE_FLOOR: -87 dBm",
-        "  INTERFERENCE: LOW",
-        "  JAMMING: NOT DETECTED",
-        "  CONFIDENCE: 98.1%",
-        "",
-        "> OPS_FEED --mode=SCROLL",
-        "  [SYS]  New SITREP uploaded: SRP-26-ALPHA",
-        "  [SYS]  Map layer updated: ISR-DRONE-DELTA",
-        "  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED",
-        "  [SYS]  Auto-archive of low-priority traffic enabled",
-        "",
-        "> EXEC MACRO \"BATTLE-COMMS\"",
-        "  STEP 1: SYNC CLOCKS .......... [OK]",
-        "  STEP 2: VERIFY CALLSIGNS ..... [OK]",
-        "  STEP 3: PUSH FREQ TABLES ..... [OK]",
-        "  STEP 4: ARM FAILOVER LINK .... [OK]",
-        "  RESULT: TACTICAL NET READY",
-        "",
-        "> PROMPT",
-        "stratsignal:/tac_ops/comms $ █"
-      ];
+  var lines = [
+    "[STRATSIGNAL OPS-TERM v3.2.7]",
+    "",
+    "> INIT COMMS_PIPE --profile TACTICAL_NET",
+    "  [OK]  Handshake with NODE: FALCON-ALPHA",
+    "  [OK]  Uplink secured via SIGMA-TUNNEL",
+    "  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE",
+    "  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms",
+    "",
+    "> LOAD MISSION_PROFILE --id MS-2047-RAZOR",
+    "  [OK]  Ruleset: ROE-BLACK",
+    "  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA",
+    "  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK",
+    "",
+    "> LINK_STATUS --verbose",
+    "  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS",
+    "  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS",
+    "  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED",
+    "",
+    "> ROUTE_SCAN --hops 6 --mask 0x7F",
+    "  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]",
+    "  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]",
+    "  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]",
+    "  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]",
+    "  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1",
+    "",
+    "> WATCH CHANNEL TAC-1 --filter=PRIORITY",
+    "  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17",
+    "  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS",
+    "  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3",
+    "",
+    "> TELEMETRY --unit=EAGLE-2",
+    "  POS: 42D-17-09  |  ALT: 231 m",
+    "  VEL: 3.2 m/s    |  HEADING: 087 deg",
+    "  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%",
+    "",
+    "> SIGNAL_ANALYTICS --window=30s",
+    "  THROUGHPUT: 4.7 Mbps",
+    "  NOISE_FLOOR: -87 dBm",
+    "  INTERFERENCE: LOW",
+    "  JAMMING: NOT DETECTED",
+    "  CONFIDENCE: 98.1%",
+    "",
+    "> OPS_FEED --mode=SCROLL",
+    "  [SYS]  New SITREP uploaded: SRP-26-ALPHA",
+    "  [SYS]  Map layer updated: ISR-DRONE-DELTA",
+    "  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED",
+    "  [SYS]  Auto-archive of low-priority traffic enabled",
+    "",
+    "> EXEC MACRO \"BATTLE-COMMS\"",
+    "  STEP 1: SYNC CLOCKS .......... [OK]",
+    "  STEP 2: VERIFY CALLSIGNS ..... [OK]",
+    "  STEP 3: PUSH FREQ TABLES ..... [OK]",
+    "  STEP 4: ARM FAILOVER LINK .... [OK]",
+    "  RESULT: TACTICAL NET READY",
+    "",
+    "> PROMPT",
+    "stratsignal:/tac_ops/comms $ " + String.fromCharCode(9608)  // full block cursor
+  ];
 
-      var i = 0;
-      var speed = 18;  // ms per line – fast but readable
+  var i = 0;
+  var speed = 20;  // ms per line – fast and readable
 
-      function printNext() {
-        if (i < lines.length) {
-          // Add line as text node (before cursor)
-          var textNode = document.createTextNode(lines[i] + '\\n');
-          terminal.insertBefore(textNode, cursor);
-          i++;
-          // Auto-scroll to bottom
-          terminal.scrollTop = terminal.scrollHeight;
-          setTimeout(printNext, speed);
-        } else {
-          // Keep cursor blinking after print is done
-          // (cursor is already visible)
-        }
-      }
+  function printNext() {
+    if (i < lines.length) {
+      // Add text line
+      var textNode = document.createTextNode(lines[i]);
+      terminal.insertBefore(textNode, cursor);
+      // Add line break
+      var br = document.createElement('br');
+      terminal.insertBefore(br, cursor);
+      i++;
+      // Scroll to bottom
+      terminal.scrollTop = terminal.scrollHeight;
+      setTimeout(printNext, speed);
+    }
+  }
 
-      printNext();
-    })();
-  </script>
+  printNext();
+})();
+</script>
 </body></html>`;
 };
 // ============ PHASE 2: LOGIN ============
