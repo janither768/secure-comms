@@ -134,7 +134,9 @@ const renderLanding = (stats = {}) => {
     flex: 1 1 300px;
     max-width: 500px;
     height: 180px;
-    overflow-y: auto;        /* scroll down as text appears */
+    overflow-y: auto;        /* Keeps the scrolling mechanics active */
+    scrollbar-width: none;   /* Hides scrollbar in Firefox */
+    -ms-overflow-style: none;/* Hides scrollbar in IE/Edge */
     background: rgba(0,0,0,0.3);
     border: 1px solid #2d3748;
     font-family: monospace;
@@ -145,6 +147,11 @@ const renderLanding = (stats = {}) => {
     margin-left: auto;       /* pins it to the right */
     white-space: pre-wrap;
     word-break: break-all;
+  }
+
+  /* Hides scrollbar for Chrome, Safari, and newer Edge browsers */
+  .terminal-col::-webkit-scrollbar {
+    display: none;
   }
   /* Cursor blink */
   .cursor {
@@ -279,7 +286,7 @@ const renderLanding = (stats = {}) => {
   var terminal = document.getElementById('terminal');
   if (!terminal) return;
 
-  // Clear any existing content inside the terminal box
+  // Clear initial HTML placeholder
   terminal.innerHTML = '';
 
   var lines = [
@@ -342,12 +349,11 @@ const renderLanding = (stats = {}) => {
     "stratsignal:/tac_ops/comms $ " + String.fromCharCode(9608)
   ];
 
-  var i = 0; // Current line index
-  var c = 0; // Current character index
-  var speed = 15; // Delay between characters in milliseconds
+  var i = 0; 
+  var c = 0; 
+  var speed = 15; 
   var currentLineDiv = null;
 
-  // Create a blinking cursor element and keep it always at the end
   var cursor = document.createElement('span');
   cursor.className = 'cursor';
   cursor.id = 'cursor';
@@ -356,30 +362,43 @@ const renderLanding = (stats = {}) => {
 
   function printNext() {
     if (i < lines.length) {
-      // If we are starting a new line, create its container element
       if (c === 0) {
         currentLineDiv = document.createElement('div');
-        // Insert the line right before the cursor
         terminal.insertBefore(currentLineDiv, cursor);
+
+        // Performance Guard: If terminal has over 50 lines, prune the oldest line
+        // (Account for the cursor element by checking if length > 51)
+        if (terminal.childNodes.length > 51) {
+          terminal.removeChild(terminal.firstChild);
+        }
       }
       
-      // Type out the line character by character
       if (c < lines[i].length) {
         currentLineDiv.textContent += lines[i].charAt(c);
         c++;
-        terminal.scrollTop = terminal.scrollHeight; // Auto-scrolls container down
+        terminal.scrollTop = terminal.scrollHeight; 
         setTimeout(printNext, speed);
       } else {
-        // Current line completed: reset character count, move to next line index
         i++;
         c = 0;
-        // Pause briefly after completing a full line before printing the next one
         setTimeout(printNext, speed * 6);
       }
+    } else {
+      // Infinite Loop Trigger: Instead of clearing, print a separator row, 
+      // pause for 2 seconds, reset indices, and continue appending logs.
+      var separator = document.createElement('div');
+      separator.style.color = '#1f2937'; // Dark subtle color for the break line
+      separator.textContent = "--------------------------------------------------";
+      terminal.insertBefore(separator, cursor);
+
+      setTimeout(function() {
+        i = 0;
+        c = 0;
+        printNext();
+      }, 2000);
     }
   }
 
-  // Kickstart the typing sequence
   printNext();
 })();
 </script>
