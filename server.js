@@ -133,10 +133,11 @@ const renderLanding = (stats = {}) => {
     gap: 12px;
     align-items: center;
   }
-  .btn-tactical {
-    min-width: 200px;
-    box-shadow: none;
-    padding: 12px 24px;
+ .buttons-col .btn-tactical {
+  width: 240px;          /* fixed width, identical for both */
+  min-width: unset;      /* remove the min‑width so it doesn’t override */
+  box-shadow: none;
+  padding: 12px 24px;
   }
   .btn-brief {
     background-color: #B85C00;
