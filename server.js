@@ -585,6 +585,7 @@ const renderMissionDashboard = (id, user, isCreator) => {
 <body>
   <div class="dash-container">
     <h2>${escapeHtml(mission.missionName)} <span style="font-size:0.7em; color:${statusColor};">[${mission.status}]</span></h2>
+    <div class="info-row"><span class="label">Mission ID:</span> <span>${id}</span></div>
     <div class="info-row"><span class="label">Creator:</span> <span>${escapeHtml(mission.creatorCallsign)}</span></div>
     <div class="info-row"><span class="label">Channel:</span> <span>${escapeHtml(mission.room)}</span></div>
     <div class="info-row"><span class="label">Operators:</span> <span>${mission.authorizedCallsigns.join(', ')}</span></div>
