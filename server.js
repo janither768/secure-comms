@@ -51,10 +51,24 @@ const renderLanding = (stats = {}) => {
   return `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
-  html, body { height: 100%; margin: 0; background-color: #060505; }
-  /* Top status bar */
+  html, body {
+    height: 100%;
+    margin: 0;
+    background-color: #060505;
+  }
+  body {
+    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
+    font-family: 'Lato', sans-serif;
+    color: #a1b0c0;
+  }
+
+  /* Fixed HUD strip */
   #top-bar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
     background: rgba(6,5,5,0.85);
     border-bottom: 1px solid #2d3748;
     padding: 10px 15px;
@@ -66,30 +80,57 @@ const renderLanding = (stats = {}) => {
     flex-wrap: wrap;
     justify-content: space-between;
   }
-  #top-bar > div { margin-bottom: 4px; }
   .zulu-clock { color: #39ff14; }
 
-  /* Main content – centered block */
+  /* Main content block – everything below the top bar */
   .main-content {
-    padding-top: 80px;
-    max-width: 600px;
+    padding-top: 80px;        /* space for fixed top bar */
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* The horizontal row for PC, vertical for mobile */
+  .content-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    max-width: 1000px;
     margin: 0 auto;
+    padding: 20px 10px;
+    gap: 30px;
+  }
+
+  /* Logo container */
+  .logo-col {
+    flex: 0 1 auto;
     text-align: center;
   }
-  .btn-group {
-    margin-top: 25px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
+  .logo-col img {
+    max-width: 200px;
+    height: auto;
   }
-  .btn-tactical { min-width: 200px; }
 
-  /* Terminal window */
-  .terminal-window {
-    width: 100%;
-    max-width: 600px;
-    margin: 30px auto 0;
+  /* Buttons column – stacked vertically */
+  .buttons-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .btn-tactical {
+    min-width: 200px;
+    box-shadow: none;
+  }
+  .btn-brief {
+    background-color: #B85C00;
+  }
+
+  /* Terminal column */
+  .terminal-col {
+    flex: 1 1 300px;
+    max-width: 500px;
     height: 160px;
     overflow: hidden;
     background: rgba(0,0,0,0.3);
@@ -98,8 +139,6 @@ const renderLanding = (stats = {}) => {
     font-size: 10px;
     line-height: 1.3;
     color: #39ff14;
-    text-align: left;
-    position: relative;
   }
   .terminal-scroll {
     animation: scrollUp 25s linear infinite;
@@ -110,25 +149,19 @@ const renderLanding = (stats = {}) => {
     100% { transform: translateY(-50%); }
   }
 
-  /* Field manual section */
+  /* Manual section (always full width) */
   .manual-section {
-    position: relative;
     margin-top: 30px;
     padding: 30px 15px;
-    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/The%20scrolling%20BG%20Trasnparent%202.png') center/cover no-repeat;
+    background: rgba(6,5,5,0.7);
     border-top: 1px solid #2d3748;
     color: #e0e0e0;
-    font-family: 'Lato', sans-serif;
     font-size: 12px;
     line-height: 1.5;
-    text-align: left;
   }
   .manual-inner {
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
-    background: rgba(6,5,5,0.7);
-    padding: 20px;
-    border: 1px solid #2d3748;
   }
   .manual-title {
     color: #39ff14;
@@ -136,9 +169,24 @@ const renderLanding = (stats = {}) => {
     font-size: 10px;
     margin-bottom: 12px;
   }
+
+  /* Phone breakpoint: stack everything */
+  @media (max-width: 700px) {
+    .content-row {
+      flex-direction: column;
+      gap: 25px;
+    }
+    .terminal-col {
+      width: 100%;
+      max-width: 100%;
+    }
+    .logo-col img {
+      max-width: 150px;
+    }
+  }
 </style></head>
 <body>
-  <!-- Top status bar -->
+  <!-- Top bar (unchanged) -->
   <div id="top-bar">
     <div>
       <span>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</span><br>
@@ -154,48 +202,157 @@ const renderLanding = (stats = {}) => {
     </div>
   </div>
 
-  <!-- Main content -->
+  <!-- Main content area -->
   <div class="main-content">
-    <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/New_OFFICIAL_LOGO.png"
-         alt="STRATSIGNAL" style="width:240px; max-width:80%; height:auto; margin-bottom:20px;">
+    <div class="content-row">
+      <!-- Logo left -->
+      <div class="logo-col">
+        <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/New_OFFICIAL_LOGO.png"
+             alt="STRATSIGNAL">
+      </div>
 
-    <div class="btn-group">
-      <button class="btn-tactical" onclick="window.location.href='/boot'" style="background:#5D3FD3;">
-        [ ENGAGE CHANNEL ]
-      </button>
-      <button class="btn-tactical" onclick="window.location.href='/brief'" style="background:#B85C00;">
-        [ MISSION BRIEF ]
-      </button>
-    </div>
+      <!-- Buttons middle -->
+      <div class="buttons-col">
+        <button class="btn-tactical" onclick="window.location.href='/boot'">
+          [ ENGAGE CHANNEL ]
+        </button>
+        <button class="btn-tactical btn-brief" onclick="window.location.href='/brief'">
+          [ MISSION BRIEF ]
+        </button>
+      </div>
 
-    <!-- Terminal -->
-    <div class="terminal-window">
-      <div class="terminal-scroll">
-        <!-- Same terminal content as before, duplicated for seamless loop -->
-        <pre style="margin:0; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
+      <!-- Terminal right -->
+      <div class="terminal-col">
+        <div class="terminal-scroll">
+          <!-- Exactly the same terminal text as before, duplicated for seamless loop -->
+          <pre style="margin:0; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
 
 > INIT COMMS_PIPE --profile TACTICAL_NET
-  [OK] Handshake with NODE: FALCON-ALPHA
-  ... (keep the whole terminal block exactly as in your original code) ...
-  > PROMPT
+  [OK]  Handshake with NODE: FALCON-ALPHA
+  [OK]  Uplink secured via SIGMA-TUNNEL
+  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
+  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
+
+> LOAD MISSION_PROFILE --id MS-2047-RAZOR
+  [OK]  Ruleset: ROE-BLACK
+  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
+  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
+
+> LINK_STATUS --verbose
+  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
+  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
+  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
+
+> ROUTE_SCAN --hops 6 --mask 0x7F
+  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
+  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
+  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
+  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
+  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
+
+> WATCH CHANNEL TAC-1 --filter=PRIORITY
+  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
+  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
+  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
+
+> TELEMETRY --unit=EAGLE-2
+  POS: 42D-17-09  |  ALT: 231 m
+  VEL: 3.2 m/s    |  HEADING: 087°
+  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
+
+> SIGNAL_ANALYTICS --window=30s
+  THROUGHPUT: 4.7 Mbps
+  NOISE_FLOOR: -87 dBm
+  INTERFERENCE: LOW
+  JAMMING: NOT DETECTED
+  CONFIDENCE: 98.1%
+
+> OPS_FEED --mode=SCROLL
+  [SYS]  New SITREP uploaded: SRP-26-ALPHA
+  [SYS]  Map layer updated: ISR-DRONE-DELTA
+  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
+  [SYS]  Auto-archive of low-priority traffic enabled
+
+> EXEC MACRO "BATTLE-COMMS"
+  STEP 1: SYNC CLOCKS .......... [OK]
+  STEP 2: VERIFY CALLSIGNS ..... [OK]
+  STEP 3: PUSH FREQ TABLES ..... [OK]
+  STEP 4: ARM FAILOVER LINK .... [OK]
+  RESULT: TACTICAL NET READY
+
+> PROMPT
 stratsignal:/tac_ops/comms $ █</pre>
-        <pre style="margin:0; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
+            <!-- Duplicate for seamless loop -->
+            <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
 
 > INIT COMMS_PIPE --profile TACTICAL_NET
-  ... (duplicate) ...
-  stratsignal:/tac_ops/comms $ █</pre>
+  [OK]  Handshake with NODE: FALCON-ALPHA
+  [OK]  Uplink secured via SIGMA-TUNNEL
+  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
+  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
+
+> LOAD MISSION_PROFILE --id MS-2047-RAZOR
+  [OK]  Ruleset: ROE-BLACK
+  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
+  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
+
+> LINK_STATUS --verbose
+  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
+  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
+  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
+
+> ROUTE_SCAN --hops 6 --mask 0x7F
+  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
+  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
+  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
+  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
+  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
+
+> WATCH CHANNEL TAC-1 --filter=PRIORITY
+  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
+  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
+  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
+
+> TELEMETRY --unit=EAGLE-2
+  POS: 42D-17-09  |  ALT: 231 m
+  VEL: 3.2 m/s    |  HEADING: 087°
+  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
+
+> SIGNAL_ANALYTICS --window=30s
+  THROUGHPUT: 4.7 Mbps
+  NOISE_FLOOR: -87 dBm
+  INTERFERENCE: LOW
+  JAMMING: NOT DETECTED
+  CONFIDENCE: 98.1%
+
+> OPS_FEED --mode=SCROLL
+  [SYS]  New SITREP uploaded: SRP-26-ALPHA
+  [SYS]  Map layer updated: ISR-DRONE-DELTA
+  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
+  [SYS]  Auto-archive of low-priority traffic enabled
+
+> EXEC MACRO "BATTLE-COMMS"
+  STEP 1: SYNC CLOCKS .......... [OK]
+  STEP 2: VERIFY CALLSIGNS ..... [OK]
+  STEP 3: PUSH FREQ TABLES ..... [OK]
+  STEP 4: ARM FAILOVER LINK .... [OK]
+  RESULT: TACTICAL NET READY
+
+> PROMPT
+stratsignal:/tac_ops/comms $ █</pre>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Field Manual -->
-  <div class="manual-section">
-    <div class="manual-inner">
-      <div class="manual-title">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
-      <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
-      <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
-      <p style="margin:0 0 8px 0;">This is a mission kit, not a social app. You call in, you execute, you purge. No one is watching, and nothing remains after you leave – unless you choose to keep it.</p>
-      <p style="margin:0;">Stay sharp. StratSignal has your six.</p>
+    <!-- Field manual (below) -->
+    <div class="manual-section">
+      <div class="manual-inner">
+        <div class="manual-title">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
+        <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
+        <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
+        <p style="margin:0 0 8px 0;">This is a mission kit, not a social app. You call in, you execute, you purge. No one is watching, and nothing remains after you leave – unless you choose to keep it.</p>
+        <p style="margin:0;">Stay sharp. StratSignal has your six.</p>
+      </div>
     </div>
   </div>
 
