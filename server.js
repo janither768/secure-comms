@@ -622,57 +622,200 @@ const renderJoinMissionForm = () => `<!DOCTYPE html>
 
 const renderMissionDashboard = (id, user, isCreator) => {
   const mission = briefs[id];
-  if (!mission) return 'Mission not found';
+  if (!mission) return '<div style="color:#ff4c4c; padding:20px; font-family:monospace;">ERR: MISSION NOT FOUND</div>';
 
+  const creator = mission.creatorCallsign || mission.creator || 'UNKNOWN';
   const statusColor = mission.status === 'ACTIVE' ? '#39ff14' : (mission.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
-  const killButton = isCreator ? `<a href="/mission/kill/${id}" class="kill" style="background:#ff4c4c; color:white;">[ KILL MISSION ]</a>` : '';
+  
+  // Only the creator receives the structural kill command button
+  const killButton = isCreator 
+    ? `<a href="/mission/kill/${id}" class="btn-dash btn-kill">[ TERMINATE MISSION HARD-RESET ]</a>` 
+    : '';
+
+  // Extract real-time user activity mapping from the global pipe
+  const roomUsers = activeUsers[mission.room] || {};
+
+  // Build the live Operator Roster list dynamically
+  const rosterHtml = mission.authorizedCallsigns.map(callsign => {
+    const cleanCallsign = callsign.trim();
+    if (!cleanCallsign) return '';
+
+    const lastSeen = roomUsers[cleanCallsign];
+    let statusText = 'OFFLINE';
+    let statusColor = '#ff4c4c'; // Red
+    let badgeStyle = 'border: 1px solid #ff4c4c; color: #ff4c4c;';
+
+    if (lastSeen) {
+      const deltaSec = Math.floor((Date.now() - lastSeen) / 1000);
+      
+      if (deltaSec <= 15) {
+        statusText = 'LIVE // ONLINE';
+        statusColor = '#39ff14'; // Tactical green
+        badgeStyle = 'background: #39ff14; color: #000; font-weight: bold;';
+      } else if (deltaSec <= 45) {
+        statusText = `STALE (${deltaSec}s)`;
+        statusColor = '#B85C00'; // Amber
+        badgeStyle = 'border: 1px solid #B85C00; color: #B85C00;';
+      } else if (deltaSec <= 90) {
+        statusText = 'SIG_DEGRADED';
+        statusColor = '#ff5722'; // Dark Amber
+        badgeStyle = 'border: 1px dashed #ff5722; color: #ff5722;';
+      } else {
+        statusText = 'SIG_LOST';
+        statusColor = '#5c748c'; // Grey
+        badgeStyle = 'border: 1px solid #5c748c; color: #5c748c;';
+      }
+    }
+
+    // Append localized role descriptors safely
+    const isOpCreator = cleanCallsign.toLowerCase() === creator.toLowerCase();
+    const isSelf = cleanCallsign.toLowerCase() === user.toLowerCase();
+    const roleTag = isOpCreator ? '<span class="op-role">[HQ_NEXUS]</span>' : (isSelf ? '<span class="op-role" style="color:#39ff14;">[YOU]</span>' : '');
+
+    return `
+      <div class="roster-card" style="border-left: 4px solid ${statusColor};">
+        <div>
+          <span class="op-name">${escapeHtml(cleanCallsign)}</span>
+          ${roleTag}
+        </div>
+        <div class="op-status-badge" style="${badgeStyle}">${statusText}</div>
+      </div>
+    `;
+  }).join('');
 
   return `<!DOCTYPE html>
-<html><head>${metaViewport}${fontImport}<style>
-  ${commonStyle}
-  html, body { height: 100%; margin: 0; }
-  body {
-    background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Lato', sans-serif;
-  }
-  .dash-container {
-    background: rgba(6,5,5,0.9);
-    border: 1px solid #2d3748;
-    padding: 25px;
-    width: 90%;
-    max-width: 650px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  h2 { font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 15px; }
-  .info-row { display:flex; justify-content:space-between; border-bottom:1px solid #2d3748; padding:8px 0; color:#a1b0c0; }
-  .label { color:#5c748c; font-weight:bold; }
-  .actions { margin-top:20px; display:flex; gap:12px; flex-wrap:wrap; }
-  a { text-decoration:none; font-family:'Michroma',sans-serif; padding:8px 16px; border:1px solid #2d3748; color:white; background:#1c2b36; }
-  a.map { background:#5D3FD3; }
-  a.chat { background:#39ff14; color:#000; }
-</style></head>
-<body>
-  <div class="dash-container">
-    <a href="/" class="btn-back">◄ BACK TO HUB</a>
-    <h2>${escapeHtml(mission.missionName)} <span style="font-size:0.7em; color:${statusColor};">[${mission.status}]</span></h2>
-    <div class="info-row"><span class="label">Mission ID:</span> <span>${id}</span></div>
-    <div class="info-row"><span class="label">Creator:</span> <span>${escapeHtml(mission.creatorCallsign)}</span></div>
-    <div class="info-row"><span class="label">Channel:</span> <span>${escapeHtml(mission.room)}</span></div>
-    <div class="info-row"><span class="label">Operators:</span> <span>${mission.authorizedCallsigns.join(', ')}</span></div>
-    <div class="info-row"><span class="label">Status:</span> <span>${mission.status}</span></div>
-    <div class="info-row"><span class="label">Calling in as:</span> <span>${escapeHtml(user)}</span></div>
+<html>
+<head>
+  ${metaViewport}
+  ${fontImport}
+  <meta http-equiv="refresh" content="15">
+  <style>
+    ${commonStyle}
+    html, body { height: 100%; margin: 0; padding: 0; background-color: #060505; }
+    body {
+      background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .dash-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      max-width: 950px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+    .panel {
+      background: rgba(11, 13, 17, 0.94);
+      border: 1px solid #2d3748;
+      padding: 22px;
+      box-sizing: border-box;
+    }
+    .panel-main { flex: 1 1 55%; display: flex; flex-direction: column; justify-content: space-between; }
+    .panel-side { flex: 1 1 45%; }
+    
+    .panel-title {
+      font-family: 'Michroma', sans-serif;
+      font-size: 0.85em;
+      color: #5c748c;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #2d3748;
+      padding-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .mission-header { font-family: 'Michroma', sans-serif; font-size: 1.3em; color: #fff; margin: 0 0 15px 0; }
+    
+    .telemetry-table { width: 100%; margin-bottom: 15px; }
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #1c2330;
+      padding: 10px 0;
+      font-size: 0.85em;
+    }
+    .telemetry-row .lbl { color: #5c748c; font-weight: bold; text-transform: uppercase; font-family: monospace; }
+    .telemetry-row .val { color: #a1b0c0; font-family: monospace; }
 
-    <div class="actions">
-      <a href="/brief/${id}" class="map">MAP BRIEF</a>
-      <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(mission.room)}" class="chat">JOIN CHAT</a>
-      ${killButton}
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+    .btn-dash {
+      text-align: center;
+      text-decoration: none;
+      font-family: 'Michroma', sans-serif;
+      padding: 14px 10px;
+      font-size: 0.75em;
+      text-transform: uppercase;
+      font-weight: bold;
+      border: 1px solid #2d3748;
+      box-sizing: border-box;
+    }
+    .btn-dash.map { background: #5D3FD3; color: white; border-color: #6e52e6; }
+    .btn-dash.chat { background: #39ff14; color: black; border-color: #50ff30; }
+    .btn-dash.kill { background: #ff4c4c; color: white; border-color: #ff6b6b; grid-column: span 2; margin-top: 5px; }
+
+    .roster-container { display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; }
+    .roster-card {
+      background: rgba(6, 5, 5, 0.7);
+      border: 1px solid #1c2330;
+      padding: 12px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    .op-name { font-weight: bold; color: #e2e8f0; font-family: monospace; font-size: 0.95em; }
+    .op-role { font-size: 0.7em; color: #5c748c; margin-left: 6px; font-family: monospace; }
+    .op-status-badge { font-size: 0.7em; padding: 3px 8px; font-family: monospace; letter-spacing: 0.5px; }
+
+    @media (max-width: 768px) {
+      .dash-layout { flex-direction: column; gap: 15px; }
+      .body { padding: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <div style="width:100%; max-width:950px;">
+    <a href="/" class="btn-back">◄ RETURN TO HUB</a>
+    
+    <div class="dash-layout">
+      <div class="panel panel-main">
+        <div>
+          <div class="panel-title">// TELEMETRY_CONSOLE</div>
+          <h2 class="mission-header">
+            ${escapeHtml(mission.missionName)} 
+            <span style="font-size:0.65em; color:${statusColor}; font-family:monospace; vertical-align:middle;">[${mission.status}]</span>
+          </h2>
+          
+          <div class="telemetry-table">
+            <div class="telemetry-row"><span class="lbl">MISSION ID</span><span class="val">#${id}</span></div>
+            <div class="telemetry-row"><span class="lbl">CHANNEL CODE</span><span class="val" style="color:#39ff14;">${escapeHtml(mission.room)}</span></div>
+            <div class="telemetry-row"><span class="lbl">NEXUS CREATOR</span><span class="val">${escapeHtml(creator)}</span></div>
+            <div class="telemetry-row"><span class="lbl">YOUR CALLSIGN</span><span class="val" style="color:#5D3FD3; font-weight:bold;">${escapeHtml(user)}</span></div>
+            <div class="telemetry-row"><span class="lbl">NET CYCLE</span><span class="val" style="color:#5c748c;">EPHEMERAL ARRAY</span></div>
+          </div>
+        </div>
+
+        <div class="actions-grid">
+          <a href="/brief/${id}" class="btn-dash map">MAP BRIEF</a>
+          <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(mission.room)}" class="btn-dash chat">JOIN CHAT</a>
+          ${killButton}
+        </div>
+      </div>
+
+      <div class="panel panel-side">
+        <div class="panel-title">// ACTIVE_OPERATIONAL_ROSTER</div>
+        <div class="roster-container">
+          ${rosterHtml}
+        </div>
+      </div>
     </div>
   </div>
-</body></html>`;
+</body>
+</html>`;
 };
 
 // ============ PHASE 2: BRIEF ============
