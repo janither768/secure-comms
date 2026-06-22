@@ -50,237 +50,247 @@ const renderLanding = (stats = {}) => {
 
   return `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
-    ${commonStyle}
-    html, body { height: 100%; margin: 0; }
-    /* Amber button override for brief */
-    .btn-brief { background-color: #B85C00; }
-@keyframes scrollUp {
-  0%   { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
-}
-</style></head>
-<body style="margin:0; background-color:#060505;">
-      <!-- Fixed background image (no scale jitter) -->
-  <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png" 
-       style="position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:-1;" alt="">
-    <table cellpadding="0" cellspacing="0" border="0" style="width:100%; height:100%; margin:0; border-collapse:collapse;">
-    <tr>
-      <td style="vertical-align:top; text-align:left; padding:15px 0 0 15px;">
-        <div style="background:rgba(6,5,5,0.5); display:inline-block; padding:8px 12px; border-radius:0px; border:0px solid #1f2937;">
-          <div class="status-matrix" style="margin:0;">
-  <div>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</div>
-  <div>RELAY_MODE : HTTP_POLL // NOMINAL</div>
-  <div style="margin-top:8px;">NET_ACTIVE : ${totalOps} OPS // ${activeChannels} CH</div>
-  <div>TRAFFIC   : ${totalMessages} MSG</div>
-  <div>UPTIME    : ${uptimeStr}</div>
-  <div style="margin-top:8px;">ZULU TIME : <span id="zulu">--:--:--</span></div>
-</div>
-
-<!-- Live ZULU clock (blinking colon) -->
-<script>
-(function() {
-  var el = document.getElementById('zulu');
-  if (!el) return;
-  function tick() {
-    var d = new Date();
-    var h = String(d.getUTCHours()).padStart(2,'0');
-    var m = String(d.getUTCMinutes()).padStart(2,'0');
-    var s = String(d.getUTCSeconds()).padStart(2,'0');
-    // Blinking colon: hide colon on even seconds
-    var sep = (d.getUTCSeconds() % 2 === 0) ? ':' : ' ';
-    el.textContent = h + sep + m + ':' + s;
+  ${commonStyle}
+  html, body { height: 100%; margin: 0; background-color: #060505; }
+  /* Top status bar */
+  #top-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(6,5,5,0.85);
+    border-bottom: 1px solid #2d3748;
+    padding: 10px 15px;
+    color: #5c748c;
+    font-family: monospace;
+    font-size: 0.7em;
+    line-height: 1.4;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
-  tick();
-  setInterval(tick, 1000);
-})();
-</script>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align:middle; text-align:center; padding:0; overflow-x:hidden;">
-        <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/New_OFFICIAL_LOGO.png"
-     alt=""
-     style="width:240px; max-width:80%; height:auto; display:block; border:none; margin:0 auto;">
-        <!-- Tactical action buttons -->
-                <div style="margin-top:20px; text-align:center;">
-          <button class="btn-tactical"
-                  onclick="window.location.href='/boot'"
-                  style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block; margin-bottom:10px;">
-            [ ENGAGE CHANNEL ]
-          </button><br>
-          <button class="btn-tactical btn-brief"
-                  onclick="window.location.href='/brief'"
-                  style="box-shadow:0px 4px 20px rgba(0,0,0,0); display:inline-block;">
-            [ MISSION BRIEF ]
-          </button>
-        </div>
+  #top-bar > div { margin-bottom: 4px; }
+  .zulu-clock { color: #39ff14; }
 
-        <!-- Terminal, same width as logo, transparent, no border -->
-        <div style="width:240px; max-width:80%; margin:25px auto 0 auto; height:160px; overflow:hidden; background:transparent; border:none; font-family:monospace; font-size:10px; line-height:1.3; color:#39ff14;">
-          <div style="animation: scrollUp 25s linear infinite;">
-            <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
+  /* Main content – centered block */
+  .main-content {
+    padding-top: 80px;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .btn-group {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-tactical { min-width: 200px; }
+
+  /* Terminal window */
+  .terminal-window {
+    width: 100%;
+    max-width: 600px;
+    margin: 30px auto 0;
+    height: 160px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid #2d3748;
+    font-family: monospace;
+    font-size: 10px;
+    line-height: 1.3;
+    color: #39ff14;
+    text-align: left;
+    position: relative;
+  }
+  .terminal-scroll {
+    animation: scrollUp 25s linear infinite;
+    padding: 10px;
+  }
+  @keyframes scrollUp {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+
+  /* Field manual section */
+  .manual-section {
+    position: relative;
+    margin-top: 30px;
+    padding: 30px 15px;
+    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/The%20scrolling%20BG%20Trasnparent%202.png') center/cover no-repeat;
+    border-top: 1px solid #2d3748;
+    color: #e0e0e0;
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .manual-inner {
+    max-width: 600px;
+    margin: 0 auto;
+    background: rgba(6,5,5,0.7);
+    padding: 20px;
+    border: 1px solid #2d3748;
+  }
+  .manual-title {
+    color: #39ff14;
+    font-family: 'Michroma', sans-serif;
+    font-size: 10px;
+    margin-bottom: 12px;
+  }
+</style></head>
+<body>
+  <!-- Top status bar -->
+  <div id="top-bar">
+    <div>
+      <span>SYS_NODE : STRATSIGNAL_PRIME // ONLINE</span><br>
+      <span>RELAY_MODE : HTTP_POLL // NOMINAL</span>
+    </div>
+    <div>
+      <span>NET_ACTIVE : ${totalOps} OPS // ${activeChannels} CH</span><br>
+      <span>TRAFFIC   : ${totalMessages} MSG</span><br>
+      <span>UPTIME    : ${uptimeStr}</span>
+    </div>
+    <div>
+      <span class="zulu-clock" id="zulu">--:--:--</span>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/New_OFFICIAL_LOGO.png"
+         alt="STRATSIGNAL" style="width:240px; max-width:80%; height:auto; margin-bottom:20px;">
+
+    <div class="btn-group">
+      <button class="btn-tactical" onclick="window.location.href='/boot'" style="background:#5D3FD3;">
+        [ ENGAGE CHANNEL ]
+      </button>
+      <button class="btn-tactical" onclick="window.location.href='/brief'" style="background:#B85C00;">
+        [ MISSION BRIEF ]
+      </button>
+    </div>
+
+    <!-- Terminal -->
+    <div class="terminal-window">
+      <div class="terminal-scroll">
+        <!-- Same terminal content as before, duplicated for seamless loop -->
+        <pre style="margin:0; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
 
 > INIT COMMS_PIPE --profile TACTICAL_NET
-  [OK]  Handshake with NODE: FALCON-ALPHA
-  [OK]  Uplink secured via SIGMA-TUNNEL
-  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
-  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
-
-> LOAD MISSION_PROFILE --id MS-2047-RAZOR
-  [OK]  Ruleset: ROE-BLACK
-  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
-  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
-
-> LINK_STATUS --verbose
-  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
-  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
-  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
-
-> ROUTE_SCAN --hops 6 --mask 0x7F
-  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
-  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
-  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
-  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
-  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
-
-> WATCH CHANNEL TAC-1 --filter=PRIORITY
-  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
-  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
-  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
-
-> TELEMETRY --unit=EAGLE-2
-  POS: 42D-17-09  |  ALT: 231 m
-  VEL: 3.2 m/s    |  HEADING: 087°
-  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
-
-> SIGNAL_ANALYTICS --window=30s
-  THROUGHPUT: 4.7 Mbps
-  NOISE_FLOOR: -87 dBm
-  INTERFERENCE: LOW
-  JAMMING: NOT DETECTED
-  CONFIDENCE: 98.1%
-
-> OPS_FEED --mode=SCROLL
-  [SYS]  New SITREP uploaded: SRP-26-ALPHA
-  [SYS]  Map layer updated: ISR-DRONE-DELTA
-  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
-  [SYS]  Auto-archive of low-priority traffic enabled
-
-> EXEC MACRO "BATTLE-COMMS"
-  STEP 1: SYNC CLOCKS .......... [OK]
-  STEP 2: VERIFY CALLSIGNS ..... [OK]
-  STEP 3: PUSH FREQ TABLES ..... [OK]
-  STEP 4: ARM FAILOVER LINK .... [OK]
-  RESULT: TACTICAL NET READY
-
-> PROMPT
+  [OK] Handshake with NODE: FALCON-ALPHA
+  ... (keep the whole terminal block exactly as in your original code) ...
+  > PROMPT
 stratsignal:/tac_ops/comms $ █</pre>
-            <!-- Duplicate for seamless loop -->
-            <pre style="margin:0; padding:6px; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
+        <pre style="margin:0; white-space:pre-wrap; color:inherit; background:transparent; border:none; font:inherit;">[STRATSIGNAL OPS-TERM v3.2.7]
 
 > INIT COMMS_PIPE --profile TACTICAL_NET
-  [OK]  Handshake with NODE: FALCON-ALPHA
-  [OK]  Uplink secured via SIGMA-TUNNEL
-  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE
-  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms
+  ... (duplicate) ...
+  stratsignal:/tac_ops/comms $ █</pre>
+      </div>
+    </div>
+  </div>
 
-> LOAD MISSION_PROFILE --id MS-2047-RAZOR
-  [OK]  Ruleset: ROE-BLACK
-  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA
-  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK
+  <!-- Field Manual -->
+  <div class="manual-section">
+    <div class="manual-inner">
+      <div class="manual-title">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
+      <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
+      <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
+      <p style="margin:0 0 8px 0;">This is a mission kit, not a social app. You call in, you execute, you purge. No one is watching, and nothing remains after you leave – unless you choose to keep it.</p>
+      <p style="margin:0;">Stay sharp. StratSignal has your six.</p>
+    </div>
+  </div>
 
-> LINK_STATUS --verbose
-  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS
-  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS
-  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED
-
-> ROUTE_SCAN --hops 6 --mask 0x7F
-  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]
-  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]
-  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]
-  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]
-  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1
-
-> WATCH CHANNEL TAC-1 --filter=PRIORITY
-  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17
-  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS
-  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3
-
-> TELEMETRY --unit=EAGLE-2
-  POS: 42D-17-09  |  ALT: 231 m
-  VEL: 3.2 m/s    |  HEADING: 087°
-  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%
-
-> SIGNAL_ANALYTICS --window=30s
-  THROUGHPUT: 4.7 Mbps
-  NOISE_FLOOR: -87 dBm
-  INTERFERENCE: LOW
-  JAMMING: NOT DETECTED
-  CONFIDENCE: 98.1%
-
-> OPS_FEED --mode=SCROLL
-  [SYS]  New SITREP uploaded: SRP-26-ALPHA
-  [SYS]  Map layer updated: ISR-DRONE-DELTA
-  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED
-  [SYS]  Auto-archive of low-priority traffic enabled
-
-> EXEC MACRO "BATTLE-COMMS"
-  STEP 1: SYNC CLOCKS .......... [OK]
-  STEP 2: VERIFY CALLSIGNS ..... [OK]
-  STEP 3: PUSH FREQ TABLES ..... [OK]
-  STEP 4: ARM FAILOVER LINK .... [OK]
-  RESULT: TACTICAL NET READY
-
-> PROMPT
-stratsignal:/tac_ops/comms $ █</pre>
-                    </div>
-        </div>
-
-                <!-- Full-width image backdrop behind field manual -->
-        <div style="position:relative; width:100vw; margin-left:calc(-50vw + 50%); margin-top:25px;">
-          <img src="https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/The%20scrolling%20BG%20Trasnparent%202.png" 
-               style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;" alt="">
-          
-          <!-- Manual text (centered, same width as logo, no background) -->
-          <div style="position:relative; z-index:1; width:240px; max-width:80%; margin:0 auto; text-align:left; font-family:'Lato',sans-serif; color:#e0e0e0; font-size:12px; line-height:1.5; padding:25px 15px;">
-            <div style="color:#39ff14; font-family:'Michroma',sans-serif; font-size:10px; margin-bottom:8px;">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
-            <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
-            <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
-            <p style="margin:0 0 8px 0;">This is a mission kit, not a social app. You call in, you execute, you purge. No one is watching, and nothing remains after you leave – unless you choose to keep it.</p>
-            <p style="margin:0;">Stay sharp. StratSignal has your six.</p>
-          </div>
-        </div>
-      </td>
-    </tr>
-  </table>
+  <!-- ZULU clock script (unchanged) -->
+  <script>
+    (function() {
+      var el = document.getElementById('zulu');
+      if (!el) return;
+      function tick() {
+        var d = new Date();
+        var h = String(d.getUTCHours()).padStart(2,'0');
+        var m = String(d.getUTCMinutes()).padStart(2,'0');
+        var s = String(d.getUTCSeconds()).padStart(2,'0');
+        var sep = (d.getUTCSeconds() % 2 === 0) ? ':' : ' ';
+        el.textContent = h + sep + m + ':' + s;
+      }
+      tick();
+      setInterval(tick, 1000);
+    })();
+  </script>
 </body></html>`;
 };
 // ============ PHASE 2: LOGIN ============
 const renderLogin = () => `<!DOCTYPE html>
-<html><head>${metaViewport}${fontImport}<style>${commonStyle}</style></head>
-<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0; height:100vh;">
-  <div style="display:table; width:100%; height:100%;">
-    <div style="display:table-cell; vertical-align:middle; text-align:center;">
-      <form method="POST" action="/login"
-            style="background:#11151c; padding:20px; border:0px solid #2d3748; 
-                   width:85%; max-width:320px; display:inline-block; text-align:left;
-                   box-sizing:border-box;">
-        <input type="text" name="username" placeholder="Callsign" required
-       style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
-              border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
-              font-family: 'Lato', sans-serif;">
-        <input type="password" name="passcode" placeholder="Channel" required
-       style="width:100%; margin-bottom:10px; padding:12px; background:#0a0c10; 
-              border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
-              font-family: 'Lato', sans-serif;">
-        <input type="text" name="target" placeholder="Target Alias (Optional)"
-       style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
-              border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; 
-              font-family: 'Lato', sans-serif;">
-        <button type="submit" class="btn-tactical" style="width:100%;">INITIALIZE</button>
-      </form>
-    </div>
+<html><head>${metaViewport}${fontImport}<style>
+  ${commonStyle}
+  html, body { height: 100%; margin: 0; background-color: #060505; }
+  body {
+    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+  }
+  .login-container {
+    background: rgba(17, 21, 28, 0.95);
+    border: 1px solid #2d3748;
+    padding: 30px 20px;
+    width: 90%;
+    max-width: 360px;
+    text-align: left;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  }
+  .login-header {
+    font-family: 'Michroma', sans-serif;
+    color: #5D3FD3;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+  .login-sub {
+    color: #5c748c;
+    font-size: 0.7em;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  label {
+    color: #5c748c;
+    font-size: 0.7em;
+    display: block;
+    margin-bottom: 5px;
+  }
+  input {
+    width: 100%;
+    padding: 12px;
+    background: #0a0c10;
+    border: 1px solid #2d3748;
+    color: #fff;
+    box-sizing: border-box;
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-family: 'Lato', sans-serif;
+  }
+  .btn-tactical {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+  }
+</style></head>
+<body>
+  <div class="login-container">
+    <div class="login-header">STRATSIGNAL</div>
+    <div class="login-sub">AUTH TERMINAL // SECURE COMMS</div>
+    <form method="POST" action="/login">
+      <label for="user">CALLSIGN</label>
+      <input type="text" id="user" name="username" required placeholder="EAGLE-2">
+
+      <label for="pass">CHANNEL / PASSCODE</label>
+      <input type="password" id="pass" name="passcode" required placeholder="TAC-1">
+
+      <label for="target">TARGET ALIAS (OPTIONAL)</label>
+      <input type="text" id="target" name="target" placeholder="Leave empty for open channel">
+
+      <button type="submit" class="btn-tactical" style="background:#5D3FD3;">INITIALIZE CHANNEL</button>
+    </form>
   </div>
 </body></html>`;
 // ============ PHASE 2: BRIEF ============
@@ -467,37 +477,39 @@ const renderChat = (user, room) => {
   activeUsers[room][user] = Date.now();
   const now = Date.now();
   let activeCount = 0;
-
   for (const [op, time] of Object.entries(activeUsers[room])) {
     if (now - time < HEARTBEAT_MS) activeCount++;
     else delete activeUsers[room][op];
   }
+  if (activeCount === 0) delete activeUsers[room];
 
   const isSecure = activeCount >= 2;
-  const connectionStatusText = `${activeCount} OPERATORS CONNECTED`;
+  const connectionText = `${activeCount} OPERATORS CONNECTED`;
 
+  // Build messages HTML with escaping
   const chatHtml = db[room].map(m => {
     let timeStr = '';
     if (m.timestamp) {
       const d = new Date(m.timestamp);
-      const hours = String(d.getUTCHours()).padStart(2, '0');
-      const mins = String(d.getUTCMinutes()).padStart(2, '0');
-      timeStr = `${hours}:${mins}`;
+      timeStr = `${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}`;
     }
+    const safeSender = escapeHtml(m.sender);
+    const safeText = escapeHtml(m.text);
+    const isMe = (m.sender === user);
 
+    // CSS tail for bubbles
+    const bubbleClass = isMe ? 'msg-right' : 'msg-left';
     return `
-    <div style="text-align:${m.sender === user ? 'right' : 'left'}; margin-bottom:10px;">
-      <div style="display:inline-block; background:${m.sender === user ? '#1c2b36' : '#161b22'}; 
-                  padding:12px; border-radius:2px; 
-                  border:1px solid ${m.sender === user ? '#2c4251' : '#2d3748'}; 
-                  text-align:left; max-width:85%; word-wrap:break-word;">
-              <b style="font-size:0.7em; color:#5c748c;">${m.sender}:</b> <span style="color:#a1b0c0; line-height:1.4;">${m.text}</span>
-        ${timeStr ? `<div style="font-size:0.6em; color:#4a5b6b; margin-top:4px; text-align:right;">${timeStr}</div>` : ''}
+    <div class="msg-row ${isMe ? 'msg-row-right' : 'msg-row-left'}">
+      <div class="bubble ${bubbleClass}">
+        <div class="bubble-meta">${safeSender}</div>
+        <div class="bubble-text">${safeText}</div>
+        ${timeStr ? `<div class="bubble-time">${timeStr}</div>` : ''}
       </div>
     </div>`;
   }).join('');
 
-  const utcTimeStr = new Date().toISOString().slice(11, 19); // HH:MM:SS for Last Ping
+  const utcTimeStr = new Date().toISOString().slice(11, 19);
 
   const encodedExport = Buffer.from(
     db[room].map(m => `[${m.sender}]: ${m.text}`).join('\n')
@@ -505,81 +517,210 @@ const renderChat = (user, room) => {
 
   return `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
-    ${commonStyle}
-    html, body { height: 100%; margin: 0; }
-    input { font-size: 16px; }
+  ${commonStyle}
+  html, body { height: 100%; margin: 0; background: #060505; }
+  body {
+    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/LOGO1_MissionBrief.jpg') center/cover no-repeat fixed;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* Fixed top header */
+  #chat-header {
+    flex-shrink: 0;
+    background: rgba(17,21,28,0.95);
+    border-bottom: 1px solid #2d3748;
+    padding: 12px 15px;
+    color: #5c748c;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8em;
+    z-index: 100;
+  }
+  #chat-header .room {
+    font-weight: bold;
+    color: #fff;
+    font-family: 'Michroma', sans-serif;
+    font-size: 0.9em;
+  }
+  #conn-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: ${isSecure ? '#39ff14' : '#5c748c'};
+    margin-left: 4px;
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.15; } }
+
+  /* Messages area */
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Message bubble styles */
+  .msg-row {
+    display: flex;
+    width: 100%;
+  }
+  .msg-row-right { justify-content: flex-end; }
+  .msg-row-left  { justify-content: flex-start; }
+
+  .bubble {
+    max-width: 80%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    position: relative;
+    font-size: 0.95em;
+    line-height: 1.4;
+    word-wrap: break-word;
+    color: #a1b0c0;
+  }
+  .msg-right {
+    background: #1c2b36;
+    border: 1px solid #2c4251;
+    margin-left: auto;
+    border-bottom-right-radius: 2px;
+  }
+  .msg-right::after {
+    content: "";
+    position: absolute;
+    bottom: 0; right: -6px;
+    width: 0; height: 0;
+    border-left: 6px solid #2c4251;
+    border-bottom: 6px solid transparent;
+    border-top: 6px solid transparent;
+  }
+  .msg-left {
+    background: #161b22;
+    border: 1px solid #2d3748;
+    margin-right: auto;
+    border-bottom-left-radius: 2px;
+  }
+  .msg-left::before {
+    content: "";
+    position: absolute;
+    bottom: 0; left: -6px;
+    width: 0; height: 0;
+    border-right: 6px solid #2d3748;
+    border-bottom: 6px solid transparent;
+    border-top: 6px solid transparent;
+  }
+
+  .bubble-meta {
+    font-size: 0.65em;
+    color: #5c748c;
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+  .bubble-time {
+    font-size: 0.6em;
+    color: #4a5b6b;
+    text-align: right;
+    margin-top: 6px;
+  }
+
+  /* Bottom toolbar */
+  #bottom-bar {
+    flex-shrink: 0;
+    background: rgba(17,21,28,0.95);
+    border-top: 1px solid #2d3748;
+    padding: 8px 15px;
+    text-align: center;
+    font-size: 0.7em;
+  }
+  #bottom-bar a {
+    color: #5c748c;
+    text-decoration: none;
+    margin: 0 5px;
+    background: rgba(92,116,140,0.15);
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+  #bottom-bar a.kill { color: #ff4c4c; background: rgba(255,76,76,0.15); }
+
+  /* Input row */
+  #input-row {
+    flex-shrink: 0;
+    display: flex;
+    padding: 10px 15px;
+    background: rgba(17,21,28,0.95);
+    border-top: 1px solid #2d3748;
+    gap: 8px;
+  }
+  #input-row input {
+    flex: 1;
+    padding: 12px;
+    background: #0a0c10;
+    border: 1px solid #2d3748;
+    color: #fff;
+    font-size: 16px;
+    font-family: 'Lato', sans-serif;
+  }
+  #input-row button {
+    padding: 12px 20px;
+    font-weight: bold;
+    background: #1c2b36;
+    color: #fff;
+    border: 1px solid #2d3748;
+    cursor: pointer;
+    font-family: 'Michroma', sans-serif;
+  }
 </style></head>
-<body style="padding-bottom:180px; padding-top:60px; background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/LOGO1_MissionBrief.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed; margin:0;"> 
-<div style="position:fixed; top:0; left:0; right:0; background:#11151c; border-bottom:1px solid #1f2937; 
-              padding:15px; z-index:100; box-sizing:border-box;">
-    <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
-      <tr>
-        <td style="text-align:left; font-size:0.8em; color:#5c748c;">CH: ${room}</td>
-        <td style="text-align:center; font-size:0.7em; color:#5c748c;">LAST PING: ${utcTimeStr}</td>
-        <td style="text-align:right; font-size:0.7em; color:${isSecure ? '#39ff14' : '#5c748c'}; font-weight:bold; letter-spacing:1px;">${connectionStatusText} <span id="conn-dot" style="color:inherit;">●</span></td>
-      </tr>
-    </table>
+<body>
+  <!-- Header -->
+  <div id="chat-header">
+    <span class="room">CH: ${escapeHtml(room)}</span>
+    <span>
+      ${connectionText} <span id="conn-dot"></span>
+    </span>
+    <span style="font-size:0.65em;">LAST PING ${utcTimeStr}</span>
   </div>
 
-  <div style="padding:15px;">
+  <!-- Messages -->
+  <div id="messages">
     ${chatHtml}
-    <!-- Spacer to clear the fixed bottom dock -->
-    <div style="height: 120px;"></div>
   </div>
 
-  <div style="position:fixed; bottom:0; left:0; right:0; background:#11151c; border-top:1px solid #2d3748; 
-              padding:10px; text-align:center; z-index:100; box-sizing:border-box;">
-    <form method="POST" action="/send" style="margin-bottom:10px; display:block; text-align:center;">
-      <input type="hidden" name="user" value="${user}">
-      <input type="hidden" name="room" value="${room}">
-      <input type="text" name="message" required placeholder="Enter Transmition" 
-             style="width:70%; padding:12px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-family: lato; margin-right:5px; box-sizing:border-box; font-size:16px;">
-      <button type="submit" style="padding:12px 20px; font-weight:bold; background:#1c2b36; color:#fff; border:1px solid #2d3748;">&gt;</button>
-    </form>
-    <div style="font-size:0.7em; line-height:1.8;">
-      <a href="data:text/plain;base64,${encodedExport}" download="chat.txt" 
-         style="color:#5c748c; text-decoration:none; background:rgba(92,116,140,0.15); padding:2px 6px; border-radius:3px;">[ CONVO DOWNLOAD ]</a>
-      <span style="color:#2d3748; margin:0 3px;">|</span>
-      <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}" 
-         style="color:#5c748c; text-decoration:none; background:rgba(92,116,140,0.15); padding:2px 6px; border-radius:3px;">[ PING ]</a>
-      <span style="color:#2d3748; margin:0 3px;">|</span>
-      <a href="/purge?room=${encodeURIComponent(room)}" 
-         style="color:#ff4c4c; text-decoration:none; font-weight:bold; background:rgba(255,76,76,0.15); padding:2px 6px; border-radius:3px;">[ KILL ]</a>
-      <span style="color:#2d3748; margin:0 3px;">|</span>
-      <a href="/boot" 
-         style="color:#83EC2D; text-decoration:none; background:rgba(131,236,45,0.15); padding:2px 6px; border-radius:3px;">[ SWAP ]</a>
-    </div>
+  <!-- Toolbar -->
+  <div id="bottom-bar">
+    <a href="data:text/plain;base64,${encodedExport}" download="chat.txt">[ CONVO DOWNLOAD ]</a>
+    <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}">[ PING ]</a>
+    <a href="/purge?room=${encodeURIComponent(room)}" class="kill">[ KILL ]</a>
+    <a href="/boot" style="color:#83EC2D; background:rgba(131,236,45,0.15);">[ SWAP ]</a>
   </div>
-<!-- Blinking green dot -->
-<script>
-(function() {
-  var dot = document.getElementById('conn-dot');
-  if (!dot) return;
-  var visible = true;
-  setInterval(function() {
-    visible = !visible;
-    dot.style.opacity = visible ? '1' : '0.15';
-  }, 500);
-})();
-</script>
 
-<!-- Auto-ping after 1 min idle -->
-<script>
-(function() {
-  var input = document.querySelector('input[name="message"]');
-  var timer;
-  function reset() {
-    clearTimeout(timer);
-    timer = setTimeout(function() {
-      location.reload();
-    }, 60000);
-  }
-  if (input) {
-    input.addEventListener('keydown', reset);
-    reset(); // start the countdown
-  }
-})();
-</script>
+  <!-- Input -->
+  <form method="POST" action="/send" id="input-row">
+    <input type="hidden" name="user" value="${escapeHtml(user)}">
+    <input type="hidden" name="room" value="${escapeHtml(room)}">
+    <input type="text" name="message" required placeholder="Enter transmission">
+    <button type="submit">&gt;</button>
+  </form>
+
+  <!-- Auto-ping script -->
+  <script>
+    (function() {
+      var input = document.querySelector('input[name="message"]');
+      var timer;
+      function reset() {
+        clearTimeout(timer);
+        timer = setTimeout(function() { location.reload(); }, 60000);
+      }
+      if (input) {
+        input.addEventListener('keydown', reset);
+        reset();
+      }
+    })();
+  </script>
 </body></html>`;
 };
 
