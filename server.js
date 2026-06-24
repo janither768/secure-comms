@@ -136,8 +136,7 @@ const renderLanding = (stats = {}) => {
   /* Terminal – takes all available vertical space */
   .terminal-col {
     flex: 1 1 300px;
-    max-width: 500px;
-    height: 180px;
+    width: 100%;
     overflow-y: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
