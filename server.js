@@ -264,17 +264,24 @@ const renderLanding = (stats = {}) => {
       </div>
     </div>
 
-    <!-- Field manual -->
+        <!-- Field manual (TARS-style) -->
     <div class="manual-section">
       <div class="manual-inner">
-        <div class="manual-title">STRATSIGNAL v0.9200 // FIELD MANUAL</div>
-        <p style="margin:0 0 8px 0;">Welcome, operator. StratSignal is your tactical web‑based communication node. It runs entirely in your browser – no install, no trace, no storage. You carry the mission; the server only holds your words in memory for as long as you need them.</p>
-        <p style="margin:0 0 8px 0;">From the hub, you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> to enter encrypted point‑to‑point comms with your team, or compile a <b style="color:#B85C00;">MISSION BRIEF</b> with a visual route map. Every message is timestamped. Every brief is disposable. You control when a channel lives or dies.</p>
-        <p style="margin:0 0 8px 0;">This is a mission kit, not a social app. You call in, you execute, you purge. No one is watching, and nothing remains after you leave – unless you choose to keep it.</p>
-        <p style="margin:0;">Stay sharp. StratSignal has your six.</p>
+        <div class="manual-title">STRATSIGNAL v0.9600 // SYSTEM BRIEF</div>
+        <p style="margin:0 0 8px 0;">
+          I’m your tactical web‑based comms node. No install, no storage, no trace. I run entirely inside your browser. You carry the mission; I hold your words in memory for as long as you need them – and not a millisecond longer.
+        </p>
+        <p style="margin:0 0 8px 0;">
+          From this hub you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> for encrypted point‑to‑point comms, or enter <b style="color:#B85C00;">MISSION MODE</b> to build a full operation: authorised operators, live rosters, and a tactical map built from your checkpoint grid.
+        </p>
+        <p style="margin:0 0 8px 0;">
+          Every message is timestamped. Every brief is disposable. Every channel can be purged with a single <b style="color:#ff4c4c;">KILL</b> command. When you’re done, I disappear – no backups, no logs, no evidence. Just a clean slate for the next op.
+        </p>
+        <p style="margin:0;">
+          I’m not a social app. I’m your <b style="color:#39ff14;">tactical advantage</b>. Call in, execute, purge. Stay sharp – I’ve got your six.
+        </p>
       </div>
     </div>
-  </div>
 
   <!-- ZULU clock script -->
   <script>
