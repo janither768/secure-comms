@@ -137,7 +137,7 @@ const renderLanding = (stats = {}) => {
   .terminal-col {
     flex: none;                   /* stretch vertically */
     width: 100%;
-    height: 134px;
+    height: 236px;
     overflow-y: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
