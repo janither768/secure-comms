@@ -1125,7 +1125,7 @@ const renderChat = (user, room) => {
   ${commonStyle}
   html, body { height: 100%; margin: 0; background: #060505; }
   body {
-    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-0.9600/BG2_NEW_.png') center/cover no-repeat fixed;
+    background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-0.9600/BG2_NEW.png') center/cover no-repeat fixed;
     display: flex;
     flex-direction: column;
     height: 100%;
