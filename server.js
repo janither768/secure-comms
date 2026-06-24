@@ -102,12 +102,12 @@ const renderLanding = (stats = {}) => {
     box-sizing: border-box;
   }
 
-  /* Horizontal row – desktop: logo left, right panel beside it */
+  /* Horizontal row – desktop */
   .content-row {
     display: flex;
     flex-direction: row;
-    align-items: stretch;        /* makes right panel match logo height */
-    justify-content: center;    /* centre the whole group */
+    align-items: center;
+    justify-content: space-between;   /* pushes left/right, middle stays center */
     flex-wrap: wrap;
     max-width: 1100px;
     margin: 0 auto;
@@ -115,32 +115,42 @@ const renderLanding = (stats = {}) => {
     gap: 20px;
   }
 
-  /* Logo – left side, natural height */
+  /* Logo – bigger, left aligned */
   .logo-col {
     flex: 0 0 auto;
+    margin-right: auto;   /* pins it to the left */
   }
   .logo-col img {
-    max-width: 280px;
+    max-width: 280px;     /* bigger logo */
     height: auto;
     display: block;
   }
 
-  /* Right panel: terminal on top, buttons at the bottom */
-  .right-panel {
-    flex: 1 1 auto;            /* grows to match logo height */
+  /* Buttons – center column */
+  .buttons-col {
     display: flex;
     flex-direction: column;
-    min-width: 0;              /* allows shrinking if needed */
+    gap: 12px;
+    align-items: center;
+  }
+ .buttons-col .btn-tactical {
+  width: 250px;          /* fixed width, identical for both */
+  min-width: unset;      /* remove the min‑width so it doesn’t override */
+  box-shadow: none;
+  padding: 12px 24px;
+  }
+  .btn-brief {
+    background-color: #B85C00;
   }
 
-  /* Terminal – takes all available vertical space */
+  /* Terminal – right aligned */
   .terminal-col {
-    flex: none;                  
-    width: 100%;
-    height: 224px;
-    overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    flex: 1 1 300px;
+    max-width: 500px;
+    height: 180px;
+    overflow-y: auto;        /* Keeps the scrolling mechanics active */
+    scrollbar-width: none;   /* Hides scrollbar in Firefox */
+    -ms-overflow-style: none;/* Hides scrollbar in IE/Edge */
     background: rgba(0,0,0,0.3);
     border: 1px solid #2d3748;
     font-family: monospace;
@@ -148,33 +158,15 @@ const renderLanding = (stats = {}) => {
     line-height: 1.3;
     color: #39ff14;
     padding: 10px;
+    margin-left: auto;       /* pins it to the right */
     white-space: pre-wrap;
     word-break: break-all;
-    box-sizing: border-box;
   }
+
+  /* Hides scrollbar for Chrome, Safari, and newer Edge browsers */
   .terminal-col::-webkit-scrollbar {
     display: none;
   }
-
-  /* Buttons row – horizontal, matches terminal width */
-  .buttons-row {
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
-    padding: 12px 0 0 0;      /* space above buttons */
-  }
-  .buttons-row .btn-tactical {
-    flex: 1;                   /* equal width, fill the terminal width */
-    min-width: unset;
-    box-shadow: none;
-    padding: 12px 24px;
-    white-space: nowrap;
-    text-align: center;
-  }
-  .btn-brief {
-    background-color: #B85C00;
-  }
-
   /* Cursor blink */
   .cursor {
     display: inline-block;
@@ -216,23 +208,17 @@ const renderLanding = (stats = {}) => {
       flex-direction: column;
       align-items: center;
     }
-    .logo-col {
-      margin: 0 auto;
+    .logo-col, .terminal-col {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+    .terminal-col {
+      width: 100%;
+      max-width: 100%;
     }
     .logo-col img {
       max-width: 180px;
-    }
-    .right-panel {
-      width: 100%;
-      max-width: 500px;       /* keep terminal readable */
-    }
-    .terminal-col {
-      height: 180px;           /* fixed height on mobile */
-      flex: none;
-    }
-    .buttons-row {
-      padding-top: 10px;
-      flex-wrap: wrap;
     }
   }
 </style></head>
@@ -262,23 +248,23 @@ const renderLanding = (stats = {}) => {
              alt="STRATSIGNAL">
       </div>
 
-      <!-- Right panel: terminal + buttons -->
-      <div class="right-panel">
-        <div class="terminal-col" id="terminal">
-          <span class="cursor" id="cursor"></span>
-        </div>
-        <div class="buttons-row">
-          <button class="btn-tactical" onclick="window.location.href='/boot'">
-            ENGAGE CHANNEL
-          </button>
-          <button class="btn-tactical btn-brief" onclick="window.location.href='/mission'">
-            MISSION MODE
-          </button>
-        </div>
+      <!-- Buttons middle -->
+      <div class="buttons-col">
+        <button class="btn-tactical" onclick="window.location.href='/boot'">
+          ENGAGE CHANNEL
+        </button>
+        <button class="btn-tactical btn-brief" onclick="window.location.href='/mission'">
+  MISSION MODE
+</button>
+      </div>
+
+      <!-- Terminal right – line-by-line typewriter -->
+      <div class="terminal-col" id="terminal">
+        <span class="cursor" id="cursor"></span>
       </div>
     </div>
 
-    <!-- Field manual (TARS-style) -->
+        <!-- Field manual (TARS-style) -->
     <div class="manual-section">
       <div class="manual-inner">
         <div class="manual-title">STRATSIGNAL v0.9600 // SYSTEM BRIEF</div>
@@ -296,7 +282,6 @@ const renderLanding = (stats = {}) => {
         </p>
       </div>
     </div>
-  </div>
 
   <!-- ZULU clock script -->
   <script>
@@ -316,122 +301,128 @@ const renderLanding = (stats = {}) => {
     })();
   </script>
 
-  <!-- Terminal typewriter script (unchanged) -->
-  <script>
-    (function() {
-      var terminal = document.getElementById('terminal');
-      if (!terminal) return;
+  <!-- Terminal typewriter script (FIXED) -->
+<script>
+(function() {
+  var terminal = document.getElementById('terminal');
+  if (!terminal) return;
 
-      // Clear initial HTML placeholder
-      terminal.innerHTML = '';
+  // Clear initial HTML placeholder
+  terminal.innerHTML = '';
 
-      var lines = [
-        "[STRATSIGNAL OPS-TERM v3.2.7]",
-        "",
-        "> INIT COMMS_PIPE --profile TACTICAL_NET",
-        "  [OK]  Handshake with NODE: FALCON-ALPHA",
-        "  [OK]  Uplink secured via SIGMA-TUNNEL",
-        "  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE",
-        "  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms",
-        "",
-        "> LOAD MISSION_PROFILE --id MS-2047-RAZOR",
-        "  [OK]  Ruleset: ROE-BLACK",
-        "  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA",
-        "  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK",
-        "",
-        "> LINK_STATUS --verbose",
-        "  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS",
-        "  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS",
-        "  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED",
-        "",
-        "> ROUTE_SCAN --hops 6 --mask 0x7F",
-        "  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]",
-        "  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]",
-        "  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]",
-        "  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]",
-        "  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1",
-        "",
-        "> WATCH CHANNEL TAC-1 --filter=PRIORITY",
-        "  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17",
-        "  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS",
-        "  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3",
-        "",
-        "> TELEMETRY --unit=EAGLE-2",
-        "  POS: 42D-17-09  |  ALT: 231 m",
-        "  VEL: 3.2 m/s    |  HEADING: 087 deg",
-        "  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%",
-        "",
-        "> SIGNAL_ANALYTICS --window=30s",
-        "  THROUGHPUT: 4.7 Mbps",
-        "  NOISE_FLOOR: -87 dBm",
-        "  INTERFERENCE: LOW",
-        "  JAMMING: NOT DETECTED",
-        "  CONFIDENCE: 98.1%",
-        "",
-        "> OPS_FEED --mode=SCROLL",
-        "  [SYS]  New SITREP uploaded: SRP-26-ALPHA",
-        "  [SYS]  Map layer updated: ISR-DRONE-DELTA",
-        "  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED",
-        "  [SYS]  Auto-archive of low-priority traffic enabled",
-        "",
-        "> EXEC MACRO \\\"BATTLE-COMMS\\\"",
-        "  STEP 1: SYNC CLOCKS .......... [OK]",
-        "  STEP 2: VERIFY CALLSIGNS ..... [OK]",
-        "  STEP 3: PUSH FREQ TABLES ..... [OK]",
-        "  STEP 4: ARM FAILOVER LINK .... [OK]",
-        "  RESULT: TACTICAL NET READY",
-        "",
-        "> PROMPT",
-        "stratsignal:/tac_ops/comms $ " + String.fromCharCode(9608)
-      ];
+  var lines = [
+    "[STRATSIGNAL OPS-TERM v3.2.7]",
+    "",
+    "> INIT COMMS_PIPE --profile TACTICAL_NET",
+    "  [OK]  Handshake with NODE: FALCON-ALPHA",
+    "  [OK]  Uplink secured via SIGMA-TUNNEL",
+    "  [OK]  Crypto suite: AES-256 / Q-LAYER SCRAMBLE",
+    "  [OK]  Latency: 12.7 ms / Jitter: 1.3 ms",
+    "",
+    "> LOAD MISSION_PROFILE --id MS-2047-RAZOR",
+    "  [OK]  Ruleset: ROE-BLACK",
+    "  [OK]  Theater: NORTHERN CORRIDOR / GRID 42-DELTA",
+    "  [OK]  Channels: TAC-1 / TAC-3 / GHOST-LINK",
+    "",
+    "> LINK_STATUS --verbose",
+    "  [TAC-1]  ONLINE   | ENCRYPTED | 0.02% PACKET LOSS",
+    "  [TAC-3]  DEGRADED | ENCRYPTED | 3.41% PACKET LOSS",
+    "  [GHOST]  STEALTH  | DARK MODE | BEACON SUPPRESSED",
+    "",
+    "> ROUTE_SCAN --hops 6 --mask 0x7F",
+    "  HOP[01]  RELAY-NODE // 10.24.7.3      [CLEAN]",
+    "  HOP[02]  FIELD-UNIT // 10.24.9.11     [CLEAN]",
+    "  HOP[03]  UNKNOWN    // 172.19.4.200   [FLAGGED]",
+    "  HOP[04]  HQ-CORE    // 10.0.0.1       [TRUSTED]",
+    "  PATH_INTEGRITY: 96.3%  |  ANOMALIES: 1",
+    "",
+    "> WATCH CHANNEL TAC-1 --filter=PRIORITY",
+    "  [00:14:03Z] [PRIO-ALPHA] EAGLE-2: CONTACT EAST, GRID 42D-17",
+    "  [00:14:07Z] [PRIO-BRAVO] RAVEN-1: DRONE FEED LIVE, PUSHING TO OPS",
+    "  [00:14:12Z] [PRIO-ALPHA] EAGLE-2: REQUESTING FIRE MISSION, TYPE 3",
+    "",
+    "> TELEMETRY --unit=EAGLE-2",
+    "  POS: 42D-17-09  |  ALT: 231 m",
+    "  VEL: 3.2 m/s    |  HEADING: 087 deg",
+    "  STATUS: GREEN   |  AMMO: 73% | FUEL: 61%",
+    "",
+    "> SIGNAL_ANALYTICS --window=30s",
+    "  THROUGHPUT: 4.7 Mbps",
+    "  NOISE_FLOOR: -87 dBm",
+    "  INTERFERENCE: LOW",
+    "  JAMMING: NOT DETECTED",
+    "  CONFIDENCE: 98.1%",
+    "",
+    "> OPS_FEED --mode=SCROLL",
+    "  [SYS]  New SITREP uploaded: SRP-26-ALPHA",
+    "  [SYS]  Map layer updated: ISR-DRONE-DELTA",
+    "  [SYS]  STRATSIGNAL RULESET PATCH: v3.2.7b APPLIED",
+    "  [SYS]  Auto-archive of low-priority traffic enabled",
+    "",
+    "> EXEC MACRO \\\"BATTLE-COMMS\\\"",
+    "  STEP 1: SYNC CLOCKS .......... [OK]",
+    "  STEP 2: VERIFY CALLSIGNS ..... [OK]",
+    "  STEP 3: PUSH FREQ TABLES ..... [OK]",
+    "  STEP 4: ARM FAILOVER LINK .... [OK]",
+    "  RESULT: TACTICAL NET READY",
+    "",
+    "> PROMPT",
+    "stratsignal:/tac_ops/comms $ " + String.fromCharCode(9608)
+  ];
 
-      var i = 0; 
-      var c = 0; 
-      var speed = 15; 
-      var currentLineDiv = null;
+  var i = 0; 
+  var c = 0; 
+  var speed = 15; 
+  var currentLineDiv = null;
 
-      var cursor = document.createElement('span');
-      cursor.className = 'cursor';
-      cursor.id = 'cursor';
-      cursor.innerHTML = '&nbsp;';
-      terminal.appendChild(cursor);
+  var cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  cursor.id = 'cursor';
+  cursor.innerHTML = '&nbsp;';
+  terminal.appendChild(cursor);
 
-      function printNext() {
-        if (i < lines.length) {
-          if (c === 0) {
-            currentLineDiv = document.createElement('div');
-            terminal.insertBefore(currentLineDiv, cursor);
-            if (terminal.childNodes.length > 51) {
-              terminal.removeChild(terminal.firstChild);
-            }
-          }
-          
-          if (c < lines[i].length) {
-            currentLineDiv.textContent += lines[i].charAt(c);
-            c++;
-            terminal.scrollTop = terminal.scrollHeight; 
-            setTimeout(printNext, speed);
-          } else {
-            i++;
-            c = 0;
-            setTimeout(printNext, speed * 6);
-          }
-        } else {
-          var separator = document.createElement('div');
-          separator.style.color = '#1f2937';
-          separator.textContent = "--------------------------------------------------";
-          terminal.insertBefore(separator, cursor);
-          setTimeout(function() {
-            i = 0;
-            c = 0;
-            printNext();
-          }, 2000);
+  function printNext() {
+    if (i < lines.length) {
+      if (c === 0) {
+        currentLineDiv = document.createElement('div');
+        terminal.insertBefore(currentLineDiv, cursor);
+
+        // Performance Guard: If terminal has over 50 lines, prune the oldest line
+        // (Account for the cursor element by checking if length > 51)
+        if (terminal.childNodes.length > 51) {
+          terminal.removeChild(terminal.firstChild);
         }
       }
+      
+      if (c < lines[i].length) {
+        currentLineDiv.textContent += lines[i].charAt(c);
+        c++;
+        terminal.scrollTop = terminal.scrollHeight; 
+        setTimeout(printNext, speed);
+      } else {
+        i++;
+        c = 0;
+        setTimeout(printNext, speed * 6);
+      }
+    } else {
+      // Infinite Loop Trigger: Instead of clearing, print a separator row, 
+      // pause for 2 seconds, reset indices, and continue appending logs.
+      var separator = document.createElement('div');
+      separator.style.color = '#1f2937'; // Dark subtle color for the break line
+      separator.textContent = "--------------------------------------------------";
+      terminal.insertBefore(separator, cursor);
 
-      printNext();
-    })();
-  </script>
+      setTimeout(function() {
+        i = 0;
+        c = 0;
+        printNext();
+      }, 2000);
+    }
+  }
+
+  printNext();
+})();
+</script>
 </body></html>`;
 };
 // ============ PHASE 2: LOGIN ============
