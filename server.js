@@ -38,24 +38,99 @@ const SERVER_START = Date.now();
 const metaViewport = `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">`;
 const fontImport = `<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">`;
 const commonStyle = `
-  body { background-color: #060505; font-family: 'Lato', sans-serif; color: #a1b0c0; margin: 0; }
-  .btn-tactical { background-color: #5D3FD3; color: white; border: none; padding: 12px 24px; cursor: pointer; font-family: 'Michroma', sans-serif; text-transform: uppercase; font-weight: bold; }
-  .status-matrix { color: #5c748c; font-family: monospace; font-size: 0.75em; }
-  input { font-size: 16px; }
+  :root {
+    --bg-0: #08080d;
+    --bg-1: #0c0c15;
+    --surface: #12121c;
+    --surface-grad: linear-gradient(160deg, #17171f 0%, #0d0d14 100%);
+    --line: #2a2a3a;
+    --line-soft: #1a1a26;
+    --text: #c2c5d2;
+    --muted: #6f7689;
+    --faint: #4d5266;
+    --accent: #8e84c6;
+    --accent-line: #5b5488;
+    --accent-2: #6b7a9c;
+    --live: #8aa9b8;
+    --danger: #c2615f;
+    --grad-accent: linear-gradient(180deg, #524c79 0%, #322f49 100%);
+    --grad-accent-hover: linear-gradient(180deg, #615a8c 0%, #3c3858 100%);
+    --grad-steel: linear-gradient(180deg, #3c4356 0%, #252a39 100%);
+    --grad-steel-hover: linear-gradient(180deg, #49516a 0%, #2f3547 100%);
+    --grad-metal: linear-gradient(180deg, #23232d 0%, #101017 100%);
+    --bevel: inset 0 1px 0 rgba(255,255,255,0.07), 0 2px 10px rgba(0,0,0,0.55);
+  }
+
+  /* Industrial reset — no rounded corners anywhere */
+  *, *::before, *::after { border-radius: 0; box-sizing: border-box; }
+  ::selection { background: rgba(142,132,198,0.35); color: #fff; }
+
+  /* Reflective slate scrollbars */
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: #0a0a11; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #2c2c3a, #16161f); border: 1px solid #34344a; }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #3a3a4d, #1d1d28); }
+
+  body {
+    background:
+      radial-gradient(1200px 700px at 80% -10%, rgba(95,86,150,0.16), transparent 60%),
+      radial-gradient(900px 600px at -10% 110%, rgba(60,70,100,0.14), transparent 55%),
+      linear-gradient(160deg, #0a0a12 0%, #07070c 60%, #050509 100%);
+    font-family: 'Lato', sans-serif;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-tactical {
+    background: var(--grad-accent);
+    color: #eceaf6;
+    border: 1px solid var(--accent-line);
+    border-top-color: #807aa8;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-family: 'Michroma', sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    font-size: 0.8em;
+    box-shadow: var(--bevel);
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  }
+  .btn-tactical:hover { background: var(--grad-accent-hover); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 16px rgba(80,70,140,0.35); }
+  .btn-tactical:active { transform: translateY(1px); }
+
+  /* Steel / secondary action (formerly amber) */
+  .btn-brief, .btn-steel {
+    background: var(--grad-steel) !important;
+    border: 1px solid #4a5268 !important;
+    border-top-color: #69718c !important;
+    color: #dfe3ee !important;
+  }
+  .btn-brief:hover, .btn-steel:hover { background: var(--grad-steel-hover) !important; }
+
+  .status-matrix { color: var(--muted); font-family: monospace; font-size: 0.75em; letter-spacing: 0.5px; }
+  input, textarea { font-size: 16px; }
+
   .btn-back {
     display: inline-block;
-    background: #2d3748;
-    color: #a1b0c0;
-    border: 1px solid #4a5b6b;
+    background: var(--grad-metal);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-top-color: #3a3a4c;
     padding: 8px 16px;
     cursor: pointer;
     font-family: 'Michroma', sans-serif;
     text-transform: uppercase;
     text-decoration: none;
     font-weight: bold;
-    font-size: 0.75em;
+    font-size: 0.72em;
+    letter-spacing: 1px;
     margin-bottom: 15px;
+    box-shadow: var(--bevel);
+    transition: color 0.15s ease, background 0.15s ease;
   }
+  .btn-back:hover { color: var(--text); background: linear-gradient(180deg, #2b2b37, #15151d); }
 `;
 // ============ PHASE 1: PRE-CHANNEL (LIVE STATUS OVERHAUL) ============
 const renderLanding = (stats = {}) => {
@@ -67,12 +142,12 @@ const renderLanding = (stats = {}) => {
   html, body {
     height: 100%;
     margin: 0;
-    background-color: #060505;
+    background-color: #08080d;
   }
   body {
     background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
     font-family: 'Lato', sans-serif;
-    color: #a1b0c0;
+    color: #c2c5d2;
   }
 
   /* Fixed HUD strip */
@@ -82,10 +157,10 @@ const renderLanding = (stats = {}) => {
     left: 0;
     right: 0;
     z-index: 200;
-    background: rgba(6,5,5,0.85);
-    border-bottom: 1px solid #2d3748;
+    background: rgba(8,8,13,0.88);
+    border-bottom: 1px solid #2a2a3a;
     padding: 10px 15px;
-    color: #5c748c;
+    color: #6f7689;
     font-family: monospace;
     font-size: 0.7em;
     line-height: 1.4;
@@ -93,7 +168,7 @@ const renderLanding = (stats = {}) => {
     flex-wrap: wrap;
     justify-content: space-between;
   }
-  .zulu-clock { color: #39ff14; }
+  .zulu-clock { color: #8aa9b8; }
 
   /* Main content area */
   .main-content {
@@ -142,11 +217,11 @@ const renderLanding = (stats = {}) => {
     scrollbar-width: none;
     -ms-overflow-style: none;
     background: rgba(0,0,0,0.3);
-    border: 1px solid #2d3748;
+    border: 1px solid #2a2a3a;
     font-family: monospace;
     font-size: 10px;
     line-height: 1.3;
-    color: #39ff14;
+    color: #8aa9b8;
     padding: 10px;
     white-space: pre-wrap;
     word-break: break-all;
@@ -172,7 +247,7 @@ const renderLanding = (stats = {}) => {
     text-align: center;
   }
   .btn-brief {
-    background-color: #B85C00;
+    background-color: #6b7a9c;
   }
 
   /* Cursor blink */
@@ -180,7 +255,7 @@ const renderLanding = (stats = {}) => {
     display: inline-block;
     width: 6px;
     height: 12px;
-    background: #39ff14;
+    background: #8aa9b8;
     vertical-align: middle;
     animation: blink 1s step-end infinite;
     margin-left: 2px;
@@ -193,9 +268,9 @@ const renderLanding = (stats = {}) => {
   .manual-section {
     margin-top: 30px;
     padding: 30px 15px;
-    background: rgba(6,5,5,0.7);
-    border-top: 1px solid #2d3748;
-    color: #e0e0e0;
+    background: rgba(8,8,13,0.65);
+    border-top: 1px solid #2a2a3a;
+    color: #d6d8e2;
     font-size: 12px;
     line-height: 1.5;
   }
@@ -204,7 +279,7 @@ const renderLanding = (stats = {}) => {
     margin: 0 auto;
   }
   .manual-title {
-    color: #39ff14;
+    color: #8aa9b8;
     font-family: 'Michroma', sans-serif;
     font-size: 10px;
     margin-bottom: 12px;
@@ -286,13 +361,13 @@ const renderLanding = (stats = {}) => {
           I’m your tactical web‑based comms node. No install, no storage, no trace. I run entirely inside your browser. You carry the mission; I hold your words in memory for as long as you need them – and not a millisecond longer.
         </p>
         <p style="margin:0 0 8px 0;">
-          From this hub you can <b style="color:#5D3FD3;">ENGAGE CHANNEL</b> for encrypted point‑to‑point comms, or enter <b style="color:#B85C00;">MISSION MODE</b> to build a full operation: authorised operators, live rosters, and a tactical map built from your checkpoint grid.
+          From this hub you can <b style="color:#8e84c6;">ENGAGE CHANNEL</b> for encrypted point‑to‑point comms, or enter <b style="color:#6b7a9c;">MISSION MODE</b> to build a full operation: authorised operators, live rosters, and a tactical map built from your checkpoint grid.
         </p>
         <p style="margin:0 0 8px 0;">
-          Every message is timestamped. Every brief is disposable. Every channel can be purged with a single <b style="color:#ff4c4c;">KILL</b> command. When you’re done, I disappear – no backups, no logs, no evidence. Just a clean slate for the next op.
+          Every message is timestamped. Every brief is disposable. Every channel can be purged with a single <b style="color:#c2615f;">KILL</b> command. When you’re done, I disappear – no backups, no logs, no evidence. Just a clean slate for the next op.
         </p>
         <p style="margin:0;">
-          I’m not a social app. I’m your <b style="color:#39ff14;">tactical advantage</b>. Call in, execute, purge. Stay sharp – I’ve got your six.
+          I’m not a social app. I’m your <b style="color:#8aa9b8;">tactical advantage</b>. Call in, execute, purge. Stay sharp – I’ve got your six.
         </p>
       </div>
     </div>
@@ -418,7 +493,7 @@ const renderLanding = (stats = {}) => {
           }
         } else {
           var separator = document.createElement('div');
-          separator.style.color = '#1f2937';
+          separator.style.color = '#1c1c2a';
           separator.textContent = "--------------------------------------------------";
           terminal.insertBefore(separator, cursor);
           setTimeout(function() {
@@ -438,7 +513,7 @@ const renderLanding = (stats = {}) => {
 const renderLogin = () => `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
-  html, body { height: 100%; margin: 0; background-color: #060505; }
+  html, body { height: 100%; margin: 0; background-color: #08080d; }
   body {
     background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-0.9600/BG1_NEW_Compressed.png') center/cover no-repeat;
     display: flex;
@@ -447,8 +522,8 @@ const renderLogin = () => `<!DOCTYPE html>
     font-family: 'Lato', sans-serif;
   }
   .login-container {
-    background: rgba(17, 21, 28, 0.95);
-    border: 1px solid #2d3748;
+    background: rgba(15,15,23,0.94);
+    border: 1px solid #2a2a3a;
     padding: 30px 20px;
     width: 90%;
     max-width: 360px;
@@ -457,19 +532,19 @@ const renderLogin = () => `<!DOCTYPE html>
   }
   .login-header {
     font-family: 'Michroma', sans-serif;
-    color: #5D3FD3;
+    color: #8e84c6;
     font-size: 1.1em;
     margin-bottom: 5px;
     text-align: center;
   }
   .login-sub {
-    color: #5c748c;
+    color: #6f7689;
     font-size: 0.7em;
     text-align: center;
     margin-bottom: 25px;
   }
   label {
-    color: #5c748c;
+    color: #6f7689;
     font-size: 0.7em;
     display: block;
     margin-bottom: 5px;
@@ -477,8 +552,8 @@ const renderLogin = () => `<!DOCTYPE html>
   input {
     width: 100%;
     padding: 12px;
-    background: #0a0c10;
-    border: 1px solid #2d3748;
+    background: #0c0c15;
+    border: 1px solid #2a2a3a;
     color: #fff;
     box-sizing: border-box;
     font-size: 16px;
@@ -506,7 +581,7 @@ const renderLogin = () => `<!DOCTYPE html>
       <label for="target">TARGET ALIAS (OPTIONAL)</label>
       <input type="text" id="target" name="target" placeholder="Leave empty for open channel">
 
-      <button type="submit" class="btn-tactical" style="background:#5D3FD3;">INITIALIZE CHANNEL</button>
+      <button type="submit" class="btn-tactical" style="background:#8e84c6;">INITIALIZE CHANNEL</button>
     </form>
   </div>
 </body></html>`;
@@ -524,16 +599,16 @@ const renderMissionLanding = () => `<!DOCTYPE html>
     font-family: 'Lato', sans-serif;
   }
   .choice-box {
-    background: rgba(17,21,28,0.95);
-    border: 1px solid #2d3748;
+    background: rgba(15,15,23,0.94);
+    border: 1px solid #2a2a3a;
     padding: 40px;
     text-align: center;
     width: 90%;
     max-width: 400px;
   }
-  h2 { font-family:'Michroma',sans-serif; color:#B85C00; margin: 0 0 30px; }
-  .btn-choice { display:inline-block; width:180px; padding:15px; margin:10px; background:#B85C00; color:white; font-family:'Michroma',sans-serif; text-decoration:none; font-size:1em; border:none; cursor:pointer; text-transform:uppercase; }
-  .btn-choice.join { background:#5D3FD3; }
+  h2 { font-family:'Michroma',sans-serif; color:#6b7a9c; margin: 0 0 30px; }
+  .btn-choice { display:inline-block; width:180px; padding:15px; margin:10px; background:#6b7a9c; color:white; font-family:'Michroma',sans-serif; text-decoration:none; font-size:1em; border:none; cursor:pointer; text-transform:uppercase; }
+  .btn-choice.join { background:#8e84c6; }
 </style></head>
 <body>
   <div class="choice-box">
@@ -557,21 +632,21 @@ const renderNewMissionForm = () => `<!DOCTYPE html>
     font-family: 'Lato', sans-serif;
   }
   .form-container {
-    background: rgba(17,21,28,0.95);
-    border: 1px solid #2d3748;
+    background: rgba(15,15,23,0.94);
+    border: 1px solid #2a2a3a;
     padding: 25px;
     width: 90%;
     max-width: 450px;
   }
-  label { color:#5c748c; font-size:0.7em; display:block; margin-bottom:5px; }
-  input, textarea { width:100%; padding:10px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; }
+  label { color:#6f7689; font-size:0.7em; display:block; margin-bottom:5px; }
+  input, textarea { width:100%; padding:10px; background:#0c0c15; border:1px solid #2a2a3a; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; }
   textarea { resize:none; font-family:monospace; }
-  .btn-tactical { width:100%; background:#B85C00; }
+  .btn-tactical { width:100%; background:#6b7a9c; }
 </style></head>
 <body>
   <div class="form-container">
     <a href="/mission" class="btn-back">◄ BACK</a>
-    <h2 style="font-family:'Michroma',sans-serif; color:#B85C00; margin:0 0 20px; font-size:1em;">CREATE MISSION</h2>
+    <h2 style="font-family:'Michroma',sans-serif; color:#6b7a9c; margin:0 0 20px; font-size:1em;">CREATE MISSION</h2>
     <form method="POST" action="/mission/create">
       <label>MISSION NAME</label>
       <input type="text" name="missionName" required placeholder="OP NIGHTFALL">
@@ -598,24 +673,24 @@ const renderJoinMissionForm = () => `<!DOCTYPE html>
   ${commonStyle}
   html, body { height: 100%; margin: 0; }
   body {
-    background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
+    background: #08080d url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Lato', sans-serif;
   }
   .join-box {
-    background: rgba(17,21,28,0.95);
-    border: 1px solid #2d3748;
+    background: rgba(15,15,23,0.94);
+    border: 1px solid #2a2a3a;
     padding: 30px;
     width: 90%;
     max-width: 400px;
     text-align: center;
   }
-  h2 { font-family:'Michroma',sans-serif; color:#5D3FD3; margin:0 0 20px; }
-  label { color:#5c748c; font-size:0.7em; display:block; margin-bottom:5px; text-align:left; }
-  input { width:100%; padding:10px; background:#0a0c10; border:1px solid #2d3748; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; box-sizing:border-box; }
-  .btn-tactical { width:100%; background:#5D3FD3; }
+  h2 { font-family:'Michroma',sans-serif; color:#8e84c6; margin:0 0 20px; }
+  label { color:#6f7689; font-size:0.7em; display:block; margin-bottom:5px; text-align:left; }
+  input { width:100%; padding:10px; background:#0c0c15; border:1px solid #2a2a3a; color:#fff; font-size:16px; margin-bottom:15px; font-family:'Lato',sans-serif; box-sizing:border-box; }
+  .btn-tactical { width:100%; background:#8e84c6; }
 </style></head>
 <body>
   <div class="join-box">
@@ -638,10 +713,10 @@ const renderJoinMissionForm = () => `<!DOCTYPE html>
 
 const renderMissionDashboard = (id, user, isCreator) => {
   const mission = briefs[id];
-  if (!mission) return '<div style="color:#ff4c4c; padding:20px; font-family:monospace;">ERR: MISSION NOT FOUND</div>';
+  if (!mission) return '<div style="color:#c2615f; padding:20px; font-family:monospace;">ERR: MISSION NOT FOUND</div>';
 
   const creator = mission.creatorCallsign || mission.creator || 'UNKNOWN';
-  const statusColor = mission.status === 'ACTIVE' ? '#39ff14' : (mission.status === 'COMPLETE' ? '#5c748c' : '#B85C00');
+  const statusColor = mission.status === 'ACTIVE' ? '#8aa9b8' : (mission.status === 'COMPLETE' ? '#6f7689' : '#6b7a9c');
   
   // Only the creator receives the structural kill command button
   const killButton = isCreator 
@@ -658,28 +733,28 @@ const renderMissionDashboard = (id, user, isCreator) => {
 
     const lastSeen = roomUsers[cleanCallsign];
     let statusText = 'OFFLINE';
-    let statusColor = '#ff4c4c'; // Red
-    let badgeStyle = 'border: 1px solid #ff4c4c; color: #ff4c4c;';
+    let statusColor = '#c2615f'; // Red
+    let badgeStyle = 'border: 1px solid #c2615f; color: #c2615f;';
 
     if (lastSeen) {
       const deltaSec = Math.floor((Date.now() - lastSeen) / 1000);
       
       if (deltaSec <= 30) {
         statusText = 'LIVE // ONLINE';
-        statusColor = '#39ff14'; // Tactical green
-        badgeStyle = 'background: #39ff14; color: #000; font-weight: bold;';
+        statusColor = '#8aa9b8'; // Tactical green
+        badgeStyle = 'background: #8aa9b8; color: #000; font-weight: bold;';
       } else if (deltaSec <= 45) {
         statusText = `STALE (${deltaSec}s)`;
-        statusColor = '#B85C00'; // Amber
-        badgeStyle = 'border: 1px solid #B85C00; color: #B85C00;';
+        statusColor = '#6b7a9c'; // Amber
+        badgeStyle = 'border: 1px solid #6b7a9c; color: #6b7a9c;';
       } else if (deltaSec <= 90) {
         statusText = 'SIG_DEGRADED';
-        statusColor = '#ff5722'; // Dark Amber
-        badgeStyle = 'border: 1px dashed #ff5722; color: #ff5722;';
+        statusColor = '#c2615f'; // Dark Amber
+        badgeStyle = 'border: 1px dashed #c2615f; color: #c2615f;';
       } else {
         statusText = 'SIG_LOST';
-        statusColor = '#5c748c'; // Grey
-        badgeStyle = 'border: 1px solid #5c748c; color: #5c748c;';
+        statusColor = '#6f7689'; // Grey
+        badgeStyle = 'border: 1px solid #6f7689; color: #6f7689;';
       }
     }
 
@@ -692,7 +767,7 @@ const renderMissionDashboard = (id, user, isCreator) => {
    roleTag += '<span class="op-role">[COMMANDER]</span> ';
    }
    if (isSelf) {
-   roleTag += '<span class="op-role" style="color:#39ff14;">[YOU]</span>';
+   roleTag += '<span class="op-role" style="color:#8aa9b8;">[YOU]</span>';
    }
 
     return `
@@ -714,9 +789,9 @@ const renderMissionDashboard = (id, user, isCreator) => {
   <meta http-equiv="refresh" content="15">
   <style>
     ${commonStyle}
-    html, body { height: 100%; margin: 0; padding: 0; background-color: #060505; }
+    html, body { height: 100%; margin: 0; padding: 0; background-color: #08080d; }
     body {
-      background: #060505 url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
+      background: #08080d url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/BG1_NEW_Compressed.png') center/cover no-repeat fixed;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -733,8 +808,8 @@ const renderMissionDashboard = (id, user, isCreator) => {
       box-sizing: border-box;
     }
     .panel {
-      background: rgba(11, 13, 17, 0.94);
-      border: 1px solid #2d3748;
+      background: rgba(15,15,23,0.94);
+      border: 1px solid #2a2a3a;
       padding: 22px;
       box-sizing: border-box;
     }
@@ -744,9 +819,9 @@ const renderMissionDashboard = (id, user, isCreator) => {
     .panel-title {
       font-family: 'Michroma', sans-serif;
       font-size: 0.85em;
-      color: #5c748c;
+      color: #6f7689;
       margin-bottom: 15px;
-      border-bottom: 1px solid #2d3748;
+      border-bottom: 1px solid #2a2a3a;
       padding-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -757,12 +832,12 @@ const renderMissionDashboard = (id, user, isCreator) => {
     .telemetry-row {
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px dashed #1c2330;
+      border-bottom: 1px dashed #1a1a26;
       padding: 10px 0;
       font-size: 0.85em;
     }
-    .telemetry-row .lbl { color: #5c748c; font-weight: bold; text-transform: uppercase; font-family: monospace; }
-    .telemetry-row .val { color: #a1b0c0; font-family: monospace; }
+    .telemetry-row .lbl { color: #6f7689; font-weight: bold; text-transform: uppercase; font-family: monospace; }
+    .telemetry-row .val { color: #c2c5d2; font-family: monospace; }
 
     .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
     .btn-dash {
@@ -773,15 +848,15 @@ const renderMissionDashboard = (id, user, isCreator) => {
       font-size: 0.75em;
       text-transform: uppercase;
       font-weight: bold;
-      border: 1px solid #2d3748;
+      border: 1px solid #2a2a3a;
       box-sizing: border-box;
     }
-    .btn-dash.map { background: #5D3FD3; color: white; border-color: #6e52e6; }
-    .btn-dash.chat { background: #39ff14; color: black; border-color: #50ff30; }
+    .btn-dash.map { background: #8e84c6; color: white; border-color: #5b5488; }
+    .btn-dash.chat { background: #8aa9b8; color: black; border-color: #8aa9b8; }
     .btn-dash.btn-kill { 
-      background: #5c748c !important; /* Forces slate gray over browser link defaults */
+      background: #6f7689 !important; /* Forces slate gray over browser link defaults */
       color: #ffffff !important; /* Forces white text over browser link defaults */
-      border-color: #718096; 
+      border-color: #6f7689; 
       grid-column: span 2; 
       margin-top: 5px; 
       cursor: pointer;
@@ -790,23 +865,23 @@ const renderMissionDashboard = (id, user, isCreator) => {
     
     /* Changes to warning-red instantly when clicked or tapped */
     .btn-dash.btn-kill:active { 
-      background: #ff4c4c !important; 
-      border-color: #ff6b6b !important;
+      background: #c2615f !important; 
+      border-color: #d08a88 !important;
       color: #ffffff !important;
     }
 
     .roster-container { display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; }
     .roster-card {
-      background: rgba(6, 5, 5, 0.7);
-      border: 1px solid #1c2330;
+      background: rgba(8,8,13,0.65);
+      border: 1px solid #1a1a26;
       padding: 12px 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       box-sizing: border-box;
     }
-    .op-name { font-weight: bold; color: #e2e8f0; font-family: monospace; font-size: 0.95em; }
-    .op-role { font-size: 0.7em; color: #5c748c; margin-left: 6px; font-family: monospace; }
+    .op-name { font-weight: bold; color: #d6d8e2; font-family: monospace; font-size: 0.95em; }
+    .op-role { font-size: 0.7em; color: #6f7689; margin-left: 6px; font-family: monospace; }
     .op-status-badge { font-size: 0.7em; padding: 3px 8px; font-family: monospace; letter-spacing: 0.5px; }
 
     @media (max-width: 768px) {
@@ -830,10 +905,10 @@ const renderMissionDashboard = (id, user, isCreator) => {
           
           <div class="telemetry-table">
             <div class="telemetry-row"><span class="lbl">MISSION ID</span><span class="val">#${id}</span></div>
-            <div class="telemetry-row"><span class="lbl">CHANNEL CODE</span><span class="val" style="color:#39ff14;">${escapeHtml(mission.room)}</span></div>
+            <div class="telemetry-row"><span class="lbl">CHANNEL CODE</span><span class="val" style="color:#8aa9b8;">${escapeHtml(mission.room)}</span></div>
             <div class="telemetry-row"><span class="lbl">OPERATION CREATOR</span><span class="val">${escapeHtml(creator)}</span></div>
-            <div class="telemetry-row"><span class="lbl">YOUR CALLSIGN</span><span class="val" style="color:#5D3FD3; font-weight:bold;">${escapeHtml(user)}</span></div>
-            <div class="telemetry-row"><span class="lbl">NET CYCLE</span><span class="val" style="color:#5c748c;">EPHEMERAL ARRAY</span></div>
+            <div class="telemetry-row"><span class="lbl">YOUR CALLSIGN</span><span class="val" style="color:#8e84c6; font-weight:bold;">${escapeHtml(user)}</span></div>
+            <div class="telemetry-row"><span class="lbl">NET CYCLE</span><span class="val" style="color:#6f7689;">EPHEMERAL ARRAY</span></div>
           </div>
         </div>
 
@@ -863,21 +938,21 @@ const renderBriefForm = () => `<!DOCTYPE html>
     html, body { height: 100%; margin: 0; }
     textarea { font-family: monospace; font-size: 16px; }
 </style></head>
-<body style="background-color:#060505; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/LOGO1_MissionBrief.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; margin:0; height:100%;">
+<body style="background-color:#08080d; background-image:url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-Z/LOGO1_MissionBrief.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; margin:0; height:100%;">
 
   <div style="display:table; width:100%; height:100%;">
     <div style="display:table-cell; vertical-align:middle; text-align:center;">
 
       <form method="POST" action="/brief"
-            style="background:#11151c; padding:20px; border:0px solid #2d3748; 
+            style="background:#12121c; padding:20px; border:0px solid #2a2a3a; 
                    width:85%; max-width:400px; display:inline-block; text-align:left;
                    box-sizing:border-box;">
-        <div style="color:#5c748c; font-size:0.7em; margin-bottom:5px;">MISSION NAME</div>
+        <div style="color:#6f7689; font-size:0.7em; margin-bottom:5px;">MISSION NAME</div>
         <input type="text" name="missionName" required placeholder="OP NIGHTFALL"
-               style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
-                      border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px;">
+               style="width:100%; margin-bottom:15px; padding:12px; background:#0c0c15; 
+                      border:1px solid #2a2a3a; color:#fff; box-sizing:border-box; font-size:16px;">
 
-        <div style="color:#5c748c; font-size:0.7em; margin-bottom:5px;">
+        <div style="color:#6f7689; font-size:0.7em; margin-bottom:5px;">
           CHECKPOINTS – one per line<br>
           Format: <b>NAME DIRECTION DISTANCE</b><br>
           (Direction: N, NE, E, SE, S, SW, W, NW)<br>
@@ -885,10 +960,10 @@ const renderBriefForm = () => `<!DOCTYPE html>
         </div>
         <textarea name="checkpoints" rows="6" required
                   placeholder="LZAlpha NE 300&#10;RidgeOverwatch E 500&#10;ExtractPoint SE 200"
-                  style="width:100%; margin-bottom:15px; padding:12px; background:#0a0c10; 
-                         border:1px solid #2d3748; color:#fff; box-sizing:border-box; font-size:16px; resize:none;"></textarea>
+                  style="width:100%; margin-bottom:15px; padding:12px; background:#0c0c15; 
+                         border:1px solid #2a2a3a; color:#fff; box-sizing:border-box; font-size:16px; resize:none;"></textarea>
 
-        <button type="submit" class="btn-tactical" style="width:100%; background:#B85C00;">COMPILE BRIEF</button>
+        <button type="submit" class="btn-tactical" style="width:100%; background:#6b7a9c;">COMPILE BRIEF</button>
       </form>
 
     </div>
@@ -897,7 +972,7 @@ const renderBriefForm = () => `<!DOCTYPE html>
 // ============ PHASE 3: IN-BRIEF ROUTE PATH ============
 const renderBrief = (id) => {
   const mission = briefs[id];
-  if (!mission) return '<div style="color:#ff4c4c; padding:20px; font-family:monospace;">ERR: BRIEF DATA NOT FOUND</div>';
+  if (!mission) return '<div style="color:#c2615f; padding:20px; font-family:monospace;">ERR: BRIEF DATA NOT FOUND</div>';
 
   const points = mission.points || [];
   
@@ -948,10 +1023,10 @@ const renderBrief = (id) => {
     // Interactive targeting reticles for each checkpoint position
     markersHtml += `
       <g class="tgt-node">
-        <circle cx="${p.x}" cy="${p.y}" r="0.12" fill="#060505" stroke="#39ff14" stroke-width="0.04" />
-        <line x1="${p.x - 0.2}" y1="${p.y}" x2="${p.x + 0.2}" y2="${p.y}" stroke="#39ff14" stroke-width="0.015" />
-        <line x1="${p.x}" y1="${p.y - 0.2}" x2="${p.x}" y2="${p.y + 0.2}" stroke="#39ff14" stroke-width="0.015" />
-        <text x="${p.x + 0.2}" y="${p.y + 0.1}" fill="#39ff14" font-family:monospace; font-size="0.25" font-weight="bold" style="letter-spacing:0px;">
+        <circle cx="${p.x}" cy="${p.y}" r="0.12" fill="#08080d" stroke="#8aa9b8" stroke-width="0.04" />
+        <line x1="${p.x - 0.2}" y1="${p.y}" x2="${p.x + 0.2}" y2="${p.y}" stroke="#8aa9b8" stroke-width="0.015" />
+        <line x1="${p.x}" y1="${p.y - 0.2}" x2="${p.x}" y2="${p.y + 0.2}" stroke="#8aa9b8" stroke-width="0.015" />
+        <text x="${p.x + 0.2}" y="${p.y + 0.1}" fill="#8aa9b8" font-family:monospace; font-size="0.25" font-weight="bold" style="letter-spacing:0px;">
           WP_${i}: ${escapeHtml(p.name)}
         </text>
       </g>
@@ -965,13 +1040,13 @@ const renderBrief = (id) => {
   ${fontImport}
   <style>
     ${commonStyle}
-    html, body { background-color: #060505; color: #a1b0c0; padding: 10px; margin:0; font-family: monospace; }
+    html, body { background-color: #08080d; color: #c2c5d2; padding: 10px; margin:0; font-family: monospace; }
     
     /* Dynamic Plotting Container - Isolates map scrollbars from the main app interface */
     .plotting-bay {
       width: 100%;
       overflow: auto; /* Activates pure panning behavior on legacy touch screens */
-      border: 1px solid #2d3748;
+      border: 1px solid #2a2a3a;
       background-color: #090b0e;
       margin-top: 15px;
       margin-bottom: 15px;
@@ -980,8 +1055,8 @@ const renderBrief = (id) => {
 
     /* Fixed Layout adjustments for Firefox 47 (No Grid or Flex Gap dependencies) */
     .brief-meta-box {
-      background: rgba(11, 13, 17, 0.9);
-      border: 1px solid #2d3748;
+      background: rgba(15,15,23,0.92);
+      border: 1px solid #2a2a3a;
       padding: 15px;
       margin-bottom: 15px;
     }
@@ -990,15 +1065,15 @@ const renderBrief = (id) => {
     .btn-action {
       display: inline-block;
       padding: 10px 15px;
-      background: #5D3FD3;
+      background: #8e84c6;
       color: #fff;
       text-decoration: none;
       font-weight: bold;
       margin-right: 10px;
       margin-bottom: 5px;
-      border: 1px solid #6e52e6;
+      border: 1px solid #5b5488;
     }
-    .btn-action.status-trigger { background: #39ff14; color: #000; border-color: #50ff30; }
+    .btn-action.status-trigger { background: #8aa9b8; color: #000; border-color: #8aa9b8; }
   </style>
 </head>
 <body>
@@ -1006,18 +1081,18 @@ const renderBrief = (id) => {
   <a href="/" class="btn-back">◄ HUB INDEX</a>
 
   <div class="brief-meta-box">
-    <div style="color: #5c748c; font-size: 0.8em; margin-bottom: 5px;">// STRATEGIC_MISSION_BRIEF</div>
+    <div style="color: #6f7689; font-size: 0.8em; margin-bottom: 5px;">// STRATEGIC_MISSION_BRIEF</div>
     <h2 style="margin: 0 0 10px 0; font-family: 'Michroma', sans-serif; color: #fff; font-size: 1.2em;">
       ${escapeHtml(mission.missionName)}
     </h2>
     <div style="font-size: 0.9em;">
-      STATUS: <span style="color:#39ff14; font-weight:bold;">[${mission.status}]</span> | 
+      STATUS: <span style="color:#8aa9b8; font-weight:bold;">[${mission.status}]</span> | 
       ESTIMATED SECTOR COVERAGE: ${(totalUnitsX * 100)}m x ${(totalUnitsY * 100)}m
     </div>
     
     <div class="btn-action-group">
       <a href="/brief/status/${id}/ACTIVE" class="btn-action status-trigger">DEPLOY // GO LIVE</a>
-      <a href="/brief/status/${id}/COMPLETE" class="btn-action" style="background:#5c748c; border-color:#718096;">ARCHIVE BRIEF</a>
+      <a href="/brief/status/${id}/COMPLETE" class="btn-action" style="background:#6f7689; border-color:#6f7689;">ARCHIVE BRIEF</a>
     </div>
   </div>
 
@@ -1027,39 +1102,39 @@ const renderBrief = (id) => {
       height="${svgHeight}px" 
       viewBox="${viewMinX} ${viewMinY} ${totalUnitsX} ${totalUnitsY}" 
       xmlns="http://www.w3.org/2000/svg"
-      style="display: block; background-color: #060505;"
+      style="display: block; background-color: #08080d;"
     >
       <defs>
         <pattern id="tactical-grid" width="1" height="1" patternUnits="userSpaceOnUse">
-          <rect width="1" height="1" fill="none" stroke="#1c2330" stroke-width="0.02" />
-          <circle cx="0" cy="0" r="0.03" fill="#2d3748" />
+          <rect width="1" height="1" fill="none" stroke="#1a1a26" stroke-width="0.02" />
+          <circle cx="0" cy="0" r="0.03" fill="#2a2a3a" />
         </pattern>
       </defs>
 
       <rect x="${viewMinX}" y="${viewMinY}" width="${totalUnitsX}" height="${totalUnitsY}" fill="url(#tactical-grid)" />
 
-      <path d="${pathD}" fill="none" stroke="#39ff14" stroke-width="0.04" stroke-dasharray="0.1,0.05" stroke-linejoin="round" stroke-linecap="round" />
+      <path d="${pathD}" fill="none" stroke="#8aa9b8" stroke-width="0.04" stroke-dasharray="0.1,0.05" stroke-linejoin="round" stroke-linecap="round" />
 
       ${markersHtml}
 
       <g transform="translate(${viewMaxX - 0.8}, ${viewMinY + 0.8})">
-        <circle cx="0" cy="0" r="0.4" fill="rgba(6,5,5,0.8)" stroke="#5c748c" stroke-width="0.02" />
-        <line x1="0" y1="-0.35" x2="0" y2="0.35" stroke="#5c748c" stroke-width="0.02" />
-        <line x1="-0.35" y1="0" x2="0.35" y2="0" stroke="#5c748c" stroke-width="0.02" />
-        <polygon points="0,-0.38 -0.08,-0.1 0,-0.18 0.08,-0.1" fill="#ff4c4c" />
-        <text x="-0.07" y="-0.45" fill="#5c748c" font-size="0.18" font-family="monospace" font-weight="bold">N</text>
+        <circle cx="0" cy="0" r="0.4" fill="rgba(8,8,13,0.8)" stroke="#6f7689" stroke-width="0.02" />
+        <line x1="0" y1="-0.35" x2="0" y2="0.35" stroke="#6f7689" stroke-width="0.02" />
+        <line x1="-0.35" y1="0" x2="0.35" y2="0" stroke="#6f7689" stroke-width="0.02" />
+        <polygon points="0,-0.38 -0.08,-0.1 0,-0.18 0.08,-0.1" fill="#c2615f" />
+        <text x="-0.07" y="-0.45" fill="#6f7689" font-size="0.18" font-family="monospace" font-weight="bold">N</text>
       </g>
 
       <g transform="translate(${viewMinX + 0.5}, ${viewMaxY - 0.5})">
-        <rect x="0" y="0" width="1" height="0.08" fill="#39ff14" />
-        <line x1="0" y1="-0.05" x2="0" y2="0.13" stroke="#39ff14" stroke-width="0.03" />
-        <line x1="1" y1="-0.05" x2="1" y2="0.13" stroke="#39ff14" stroke-width="0.03" />
-        <text x="0" y="-0.15" fill="#a1b0c0" font-size="0.2" font-family="monospace">100m (S_SCALE)</text>
+        <rect x="0" y="0" width="1" height="0.08" fill="#8aa9b8" />
+        <line x1="0" y1="-0.05" x2="0" y2="0.13" stroke="#8aa9b8" stroke-width="0.03" />
+        <line x1="1" y1="-0.05" x2="1" y2="0.13" stroke="#8aa9b8" stroke-width="0.03" />
+        <text x="0" y="-0.15" fill="#c2c5d2" font-size="0.2" font-family="monospace">100m (S_SCALE)</text>
       </g>
     </svg>
   </div>
 
-  <div style="color: #5c748c; font-size: 0.8em; text-align: center;">
+  <div style="color: #6f7689; font-size: 0.8em; text-align: center;">
     // USE TOUCH SWIPE OR MOUSE DRAG INSIDE PLOTTING BAY TO NAVIGATE CHASSIS MAPPING Array
   </div>
 
@@ -1085,7 +1160,7 @@ const renderChat = (user, room) => {
   const isMissionChat = constraints && constraints.missionId;
   const missionDashboardLink = isMissionChat
     ? `<a href="/mission/${constraints.missionId}/dashboard?user=${encodeURIComponent(user)}&token=${encodeURIComponent(room)}" 
-         style="color:#B85C00; background:rgba(184,92,0,0.15); padding:2px 8px; border-radius:3px; text-decoration:none;">[ MISSION DASHBOARD ]</a>`
+         style="color:#a39ed6; background:rgba(107,122,156,0.18); padding:3px 10px; border:1px solid #3a4256; text-decoration:none;">[ MISSION DASHBOARD ]</a>`
     : '';
 
   const isSecure = activeCount >= 2;
@@ -1123,7 +1198,7 @@ const renderChat = (user, room) => {
   return `<!DOCTYPE html>
 <html><head>${metaViewport}${fontImport}<style>
   ${commonStyle}
-  html, body { height: 100%; margin: 0; background: #060505; }
+  html, body { height: 100%; margin: 0; background: #08080d; }
   body {
     background: url('https://raw.githubusercontent.com/janither768/secure-comms/refs/heads/StratSignal-prototype-0.9600/BG2_NEW.png') center/cover no-repeat fixed;
     display: flex;
@@ -1134,10 +1209,10 @@ const renderChat = (user, room) => {
   /* Fixed top header */
   #chat-header {
     flex-shrink: 0;
-    background: rgba(17,21,28,0.95);
-    border-bottom: 1px solid #2d3748;
+    background: rgba(15,15,23,0.94);
+    border-bottom: 1px solid #2a2a3a;
     padding: 12px 15px;
-    color: #5c748c;
+    color: #6f7689;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1153,8 +1228,8 @@ const renderChat = (user, room) => {
   #conn-dot {
     display: inline-block;
     width: 8px; height: 8px;
-    border-radius: 50%;
-    background: ${isSecure ? '#39ff14' : '#5c748c'};
+    background: ${isSecure ? '#8aa9b8' : '#6f7689'};
+    box-shadow: 0 0 6px ${isSecure ? 'rgba(138,169,184,0.8)' : 'transparent'};
     margin-left: 4px;
     vertical-align: middle;
     animation: blink 1s step-end infinite;
@@ -1182,53 +1257,54 @@ const renderChat = (user, room) => {
   .bubble {
     max-width: 80%;
     padding: 10px 12px;
-    border-radius: 6px;
     position: relative;
     font-size: 0.95em;
     line-height: 1.4;
     word-wrap: break-word;
-    color: #a1b0c0;
+    color: #c2c5d2;
   }
   .msg-right {
-    background: #1c2b36;
-    border: 1px solid #2c4251;
+    background: linear-gradient(160deg, #2a2742 0%, #1d1b2e 100%);
+    border: 1px solid #3a3556;
+    border-top-color: #4a4570;
     margin-left: auto;
-    border-bottom-right-radius: 2px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .msg-right::after {
     content: "";
     position: absolute;
     bottom: 0; right: -6px;
     width: 0; height: 0;
-    border-left: 6px solid #2c4251;
+    border-left: 6px solid #3a3556;
     border-bottom: 6px solid transparent;
     border-top: 6px solid transparent;
   }
   .msg-left {
-    background: #161b22;
-    border: 1px solid #2d3748;
+    background: linear-gradient(160deg, #181820 0%, #101017 100%);
+    border: 1px solid #2a2a3a;
+    border-top-color: #34344a;
     margin-right: auto;
-    border-bottom-left-radius: 2px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   }
   .msg-left::before {
     content: "";
     position: absolute;
     bottom: 0; left: -6px;
     width: 0; height: 0;
-    border-right: 6px solid #2d3748;
+    border-right: 6px solid #2a2a3a;
     border-bottom: 6px solid transparent;
     border-top: 6px solid transparent;
   }
 
   .bubble-meta {
     font-size: 0.65em;
-    color: #5c748c;
+    color: #6f7689;
     margin-bottom: 4px;
     font-weight: bold;
   }
   .bubble-time {
     font-size: 0.6em;
-    color: #4a5b6b;
+    color: #4d5266;
     text-align: right;
     margin-top: 6px;
   }
@@ -1236,36 +1312,38 @@ const renderChat = (user, room) => {
   /* Bottom toolbar */
   #bottom-bar {
     flex-shrink: 0;
-    background: rgba(17,21,28,0.95);
-    border-top: 1px solid #2d3748;
+    background: rgba(15,15,23,0.94);
+    border-top: 1px solid #2a2a3a;
     padding: 8px 15px;
     text-align: center;
     font-size: 0.7em;
   }
   #bottom-bar a {
-    color: #5c748c;
+    color: #6f7689;
     text-decoration: none;
     margin: 0 5px;
-    background: rgba(92,116,140,0.15);
-    padding: 2px 8px;
-    border-radius: 3px;
+    background: rgba(111,118,137,0.16);
+    border: 1px solid #232330;
+    padding: 3px 9px;
+    transition: color 0.15s ease, background 0.15s ease;
   }
-  #bottom-bar a.kill { color: #ff4c4c; background: rgba(255,76,76,0.15); }
+  #bottom-bar a:hover { color: #c2c5d2; background: rgba(111,118,137,0.28); }
+  #bottom-bar a.kill { color: #c2615f; background: rgba(194,97,95,0.18); }
 
   /* Input row */
   #input-row {
     flex-shrink: 0;
     display: flex;
     padding: 10px 15px;
-    background: rgba(17,21,28,0.95);
-    border-top: 1px solid #2d3748;
+    background: rgba(15,15,23,0.94);
+    border-top: 1px solid #2a2a3a;
     gap: 8px;
   }
   #input-row input {
     flex: 1;
     padding: 12px;
-    background: #0a0c10;
-    border: 1px solid #2d3748;
+    background: #0c0c15;
+    border: 1px solid #2a2a3a;
     color: #fff;
     font-size: 16px;
     font-family: 'Lato', sans-serif;
@@ -1273,9 +1351,9 @@ const renderChat = (user, room) => {
   #input-row button {
     padding: 12px 20px;
     font-weight: bold;
-    background: #1c2b36;
+    background: #232036;
     color: #fff;
-    border: 1px solid #2d3748;
+    border: 1px solid #2a2a3a;
     cursor: pointer;
     font-family: 'Michroma', sans-serif;
   }
@@ -1297,13 +1375,13 @@ const renderChat = (user, room) => {
    <!-- Toolbar -->
   <div id="bottom-bar">
     <a href="data:text/plain;base64,${encodedExport}" download="chat.txt">[ CONVO DOWNLOAD ]</a>
-    <span style="color:#2d3748; margin:0 3px;">|</span>
+    <span style="color:#2a2a3a; margin:0 3px;">|</span>
     <a href="/chat?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}">[ PING ]</a>
-    ${isMissionChat ? '<span style="color:#2d3748; margin:0 3px;">|</span>' + missionDashboardLink : ''}
-    <span style="color:#2d3748; margin:0 3px;">|</span>
+    ${isMissionChat ? '<span style="color:#2a2a3a; margin:0 3px;">|</span>' + missionDashboardLink : ''}
+    <span style="color:#2a2a3a; margin:0 3px;">|</span>
     <a href="/purge?room=${encodeURIComponent(room)}" class="kill">[ KILL ]</a>
-    <span style="color:#2d3748; margin:0 3px;">|</span>
-    <a href="/boot" style="color:#83EC2D; background:rgba(131,236,45,0.15);">[ SWAP ]</a>
+    <span style="color:#2a2a3a; margin:0 3px;">|</span>
+    <a href="/boot" style="color:#9a93c4; background:rgba(154,147,196,0.18);">[ SWAP ]</a>
   </div>
 
   <!-- Input -->
@@ -1366,12 +1444,12 @@ app.get('/chat', (req, res) => {
     // New mission-style authorized list
     if (constraints.authorized) {
       if (!user || !constraints.authorized.includes(user)) {
-        return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+        return res.send("<body style='background:#0c0c15; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
       }
     } 
     // Old-style single target+creator check (casual locked channel)
     else if (constraints.target && user !== constraints.target && user !== constraints.creator) {
-      return res.send("<body style='background:#0a0c10; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
+      return res.send("<body style='background:#0c0c15; color:#fff;'><div style='padding:20px;'>ERR: UNAUTHORIZED VECTOR</div></body>");
     }
   }
   
